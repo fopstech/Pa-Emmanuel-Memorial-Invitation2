@@ -15,4 +15,6 @@ export interface Invitation {
   event: Event;
   rsvpStatus: RsvpStatus;
   checkedIn: boolean;
+  /** @nullable */
+  checkedInAt: string | null;
 }

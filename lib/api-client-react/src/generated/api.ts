@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AccessCodeInput,
   AdminLoginInput,
   AdminSession,
   BadRequestResponse,
@@ -373,6 +374,77 @@ export const useUpdateRsvp = <TError = ErrorType<BadRequestResponse | NotFoundRe
       return useMutation(getUpdateRsvpMutationOptions(options));
     }
 
+export const getCheckInInvitationUrl = (token: string,) => {
+
+
+
+
+  return `/api/invitations/${token}/check-in`
+}
+
+/**
+ * @summary Allow a guest to check themselves in
+ */
+export const checkInInvitation = async (token: string, options?: Parameters<typeof customFetch>[1]): Promise<CheckInResult> => {
+
+  return customFetch<CheckInResult>(getCheckInInvitationUrl(token),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getCheckInInvitationMutationOptions = <TError = ErrorType<NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkInInvitation>>, TError,{token: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkInInvitation>>, TError,{token: string}, TContext> => {
+
+const mutationKey = ['checkInInvitation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkInInvitation>>, {token: string}> = (props) => {
+          const {token} = props ?? {};
+
+          return  checkInInvitation(token,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CheckInInvitationMutationResult = NonNullable<Awaited<ReturnType<typeof checkInInvitation>>>
+
+    export type CheckInInvitationMutationError = ErrorType<NotFoundResponse>
+
+    /**
+ * @summary Allow a guest to check themselves in
+ */
+export const useCheckInInvitation = <TError = ErrorType<NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkInInvitation>>, TError,{token: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof checkInInvitation>>,
+        TError,
+        {token: string},
+        TContext
+      > => {
+      return useMutation(getCheckInInvitationMutationOptions(options));
+    }
+
 export const getCheckInGuestUrl = () => {
 
 
@@ -399,7 +471,7 @@ export const checkInGuest = async (checkInInput: CheckInInput, options?: Paramet
 
 
 
-export const getCheckInGuestMutationOptions = <TError = ErrorType<BadRequestResponse>,
+export const getCheckInGuestMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkInGuest>>, TError,{data: BodyType<CheckInInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof checkInGuest>>, TError,{data: BodyType<CheckInInput>}, TContext> => {
 
@@ -428,12 +500,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type CheckInGuestMutationResult = NonNullable<Awaited<ReturnType<typeof checkInGuest>>>
     export type CheckInGuestMutationBody = BodyType<CheckInInput>
-    export type CheckInGuestMutationError = ErrorType<BadRequestResponse>
+    export type CheckInGuestMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse>
 
     /**
  * @summary Check in a guest with an invitation code
  */
-export const useCheckInGuest = <TError = ErrorType<BadRequestResponse>,
+export const useCheckInGuest = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkInGuest>>, TError,{data: BodyType<CheckInInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof checkInGuest>>,
@@ -443,6 +515,225 @@ export const useCheckInGuest = <TError = ErrorType<BadRequestResponse>,
       > => {
       return useMutation(getCheckInGuestMutationOptions(options));
     }
+
+export const getUsherLoginUrl = () => {
+
+
+
+
+  return `/api/usher/login`
+}
+
+/**
+ * @summary Start an usher session
+ */
+export const usherLogin = async (accessCodeInput: AccessCodeInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminSession> => {
+
+  return customFetch<AdminSession>(getUsherLoginUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(accessCodeInput)
+  }
+);}
+
+
+
+
+
+export const getUsherLoginMutationOptions = <TError = ErrorType<UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usherLogin>>, TError,{data: BodyType<AccessCodeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof usherLogin>>, TError,{data: BodyType<AccessCodeInput>}, TContext> => {
+
+const mutationKey = ['usherLogin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usherLogin>>, {data: BodyType<AccessCodeInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  usherLogin(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UsherLoginMutationResult = NonNullable<Awaited<ReturnType<typeof usherLogin>>>
+    export type UsherLoginMutationBody = BodyType<AccessCodeInput>
+    export type UsherLoginMutationError = ErrorType<UnauthorizedResponse>
+
+    /**
+ * @summary Start an usher session
+ */
+export const useUsherLogin = <TError = ErrorType<UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usherLogin>>, TError,{data: BodyType<AccessCodeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof usherLogin>>,
+        TError,
+        {data: BodyType<AccessCodeInput>},
+        TContext
+      > => {
+      return useMutation(getUsherLoginMutationOptions(options));
+    }
+
+export const getUsherLogoutUrl = () => {
+
+
+
+
+  return `/api/usher/logout`
+}
+
+/**
+ * @summary End the usher session
+ */
+export const usherLogout = async ( options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getUsherLogoutUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getUsherLogoutMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usherLogout>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof usherLogout>>, TError,void, TContext> => {
+
+const mutationKey = ['usherLogout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usherLogout>>, void> = () => {
+
+
+          return  usherLogout(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UsherLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof usherLogout>>>
+
+    export type UsherLogoutMutationError = ErrorType<unknown>
+
+    /**
+ * @summary End the usher session
+ */
+export const useUsherLogout = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usherLogout>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof usherLogout>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getUsherLogoutMutationOptions(options));
+    }
+
+export const getGetUsherSessionUrl = () => {
+
+
+
+
+  return `/api/usher/session`
+}
+
+/**
+ * @summary Get the current usher session
+ */
+export const getUsherSession = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminSession> => {
+
+  return customFetch<AdminSession>(getGetUsherSessionUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetUsherSessionQueryKey = () => {
+    return [
+    `/api/usher/session`
+    ] as const;
+    }
+
+
+export const getGetUsherSessionQueryOptions = <TData = Awaited<ReturnType<typeof getUsherSession>>, TError = ErrorType<UnauthorizedResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getUsherSession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetUsherSessionQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsherSession>>> = ({ signal }) => getUsherSession({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUsherSession>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetUsherSessionQueryResult = NonNullable<Awaited<ReturnType<typeof getUsherSession>>>
+export type GetUsherSessionQueryError = ErrorType<UnauthorizedResponse>
+
+
+/**
+ * @summary Get the current usher session
+ */
+
+export function useGetUsherSession<TData = Awaited<ReturnType<typeof getUsherSession>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getUsherSession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetUsherSessionQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getAdminLoginUrl = () => {
 

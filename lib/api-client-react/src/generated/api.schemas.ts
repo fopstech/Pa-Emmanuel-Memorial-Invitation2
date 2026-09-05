@@ -15,6 +15,8 @@ export interface EventOccurrence {
   time: string;
   isoStart?: string;
   isoEnd?: string;
+  venue: string;
+  directionsUrl?: string;
 }
 
 export interface Event {
@@ -22,10 +24,8 @@ export interface Event {
   title: string;
   wakeKeep: EventOccurrence;
   burial: EventOccurrence;
-  venue: string;
   dressCode: string;
-  directionsUrl?: string;
-  clothingImageUrl?: string;
+  photos: string[];
 }
 
 export type RsvpStatus = typeof RsvpStatus[keyof typeof RsvpStatus];
@@ -53,6 +53,7 @@ export interface Guest {
   phone?: string | null;
   /** @nullable */
   email?: string | null;
+  invitationCode: string;
   token: string;
   invitationUrl: string;
   rsvpStatus: RsvpStatus;
@@ -70,6 +71,8 @@ export interface Invitation {
   event: Event;
   rsvpStatus: RsvpStatus;
   checkedIn: boolean;
+  /** @nullable */
+  checkedInAt: string | null;
 }
 
 export interface GuestInput {
@@ -138,9 +141,12 @@ export interface CheckInResult {
 
 export interface AdminLoginInput {
   /** @minLength 1 */
-  username: string;
+  accessCode: string;
+}
+
+export interface AccessCodeInput {
   /** @minLength 1 */
-  password: string;
+  accessCode: string;
 }
 
 export interface AdminSession {

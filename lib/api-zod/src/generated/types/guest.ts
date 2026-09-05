@@ -14,6 +14,7 @@ export interface Guest {
   phone?: string | null;
   /** @nullable */
   email?: string | null;
+  invitationCode: string;
   token: string;
   invitationUrl: string;
   rsvpStatus: RsvpStatus;

@@ -83,6 +83,22 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
+  /invitations/{token}/check-in:
+    post:
+      operationId: checkInInvitation
+      tags: [invitation]
+      summary: Allow a guest to check themselves in
+      parameters:
+        - $ref: "#/components/parameters/InvitationToken"
+      responses:
+        "200":
+          description: Check-in result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckInResult"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /check-in:
     post:
       operationId: checkInGuest
@@ -103,6 +119,50 @@ paths:
                 $ref: "#/components/schemas/CheckInResult"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /usher/login:
+    post:
+      operationId: usherLogin
+      tags: [usher-auth]
+      summary: Start an usher session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccessCodeInput"
+      responses:
+        "200":
+          description: Authenticated usher session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /usher/logout:
+    post:
+      operationId: usherLogout
+      tags: [usher-auth]
+      summary: End the usher session
+      responses:
+        "204":
+          description: Session ended
+  /usher/session:
+    get:
+      operationId: getUsherSession
+      tags: [usher-auth]
+      summary: Get the current usher session
+      responses:
+        "200":
+          description: Current usher session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
   /admin/login:
     post:
       operationId: adminLogin
@@ -375,7 +435,7 @@ components:
       required: [status]
     Event:
       type: object
-      required: [name, title, wakeKeep, burial, venue, dressCode]
+      required: [name, title, wakeKeep, burial, dressCode, photos]
       properties:
         name:
           type: string
@@ -385,17 +445,15 @@ components:
           $ref: "#/components/schemas/EventOccurrence"
         burial:
           $ref: "#/components/schemas/EventOccurrence"
-        venue:
-          type: string
         dressCode:
           type: string
-        directionsUrl:
-          type: string
-        clothingImageUrl:
-          type: string
+        photos:
+          type: array
+          items:
+            type: string
     EventOccurrence:
       type: object
-      required: [date, time, label]
+      required: [date, time, label, venue]
       properties:
         label:
           type: string
@@ -407,6 +465,10 @@ components:
           type: string
         isoEnd:
           type: string
+        venue:
+          type: string
+        directionsUrl:
+          type: string
     RsvpStatus:
       type: string
       enum: [pending, attending, not_attending]
@@ -415,7 +477,7 @@ components:
       enum: [all, checked_in, not_checked_in]
     Guest:
       type: object
-      required: [id, name, token, invitationUrl, rsvpStatus, checkedIn, createdAt, updatedAt]
+      required: [id, name, invitationCode, token, invitationUrl, rsvpStatus, checkedIn, createdAt, updatedAt]
       properties:
         id:
           type: integer
@@ -425,6 +487,8 @@ components:
           type: ["string", "null"]
         email:
           type: ["string", "null"]
+        invitationCode:
+          type: string
         token:
           type: string
         invitationUrl:
@@ -441,7 +505,7 @@ components:
           type: string
     Invitation:
       type: object
-      required: [name, token, invitationUrl, event, rsvpStatus, checkedIn]
+      required: [name, token, invitationUrl, event, rsvpStatus, checkedIn, checkedInAt]
       properties:
         name:
           type: string
@@ -455,6 +519,8 @@ components:
           $ref: "#/components/schemas/RsvpStatus"
         checkedIn:
           type: boolean
+        checkedInAt:
+          type: ["string", "null"]
     GuestInput:
       type: object
       required: [name]
@@ -512,12 +578,16 @@ components:
           type: ["string", "null"]
     AdminLoginInput:
       type: object
-      required: [username, password]
+      required: [accessCode]
       properties:
-        username:
+        accessCode:
           type: string
           minLength: 1
-        password:
+    AccessCodeInput:
+      type: object
+      required: [accessCode]
+      properties:
+        accessCode:
           type: string
           minLength: 1
     AdminSession:

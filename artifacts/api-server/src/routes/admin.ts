@@ -14,7 +14,7 @@ import { db, guestsTable } from "@workspace/db";
 import {
   adminIsConfigured,
   clearAdminSession,
-  credentialsMatch,
+  accessCodeMatches,
   getAdminUsername,
   requireAdmin,
   setAdminSession,
@@ -22,6 +22,7 @@ import {
 import { parseGuestCsv } from "../lib/csv";
 import {
   cleanOptional,
+  createUniqueInvitationCode,
   createUniqueToken,
   findDuplicateGuest,
   normalize,
@@ -31,17 +32,17 @@ import {
 const router: IRouter = Router();
 
 router.post("/admin/login", (req, res) => {
-  const { username, password } = AdminLoginBody.parse(req.body);
+  const { accessCode } = AdminLoginBody.parse(req.body);
   if (!adminIsConfigured()) {
-    res.status(503).json({ error: "Admin credentials are not configured." });
+    res.status(503).json({ error: "Admin access is not configured." });
     return;
   }
-  if (!credentialsMatch(username, password)) {
-    res.status(401).json({ error: "Incorrect admin credentials." });
+  if (!accessCodeMatches(accessCode, "admin")) {
+    res.status(401).json({ error: "Incorrect admin access code." });
     return;
   }
-  setAdminSession(res, username);
-  res.json({ authenticated: true, username });
+  setAdminSession(res);
+  res.json({ authenticated: true, username: "administrator" });
 });
 
 router.post("/admin/logout", (req, res) => {
@@ -107,10 +108,13 @@ router.post("/admin/guests", async (req, res) => {
     res.status(409).json({ error: "A guest with matching details already exists." });
     return;
   }
-  const token = await createUniqueToken();
+  const [invitationCode, token] = await Promise.all([
+    createUniqueInvitationCode(),
+    createUniqueToken(),
+  ]);
   const [guest] = await db
     .insert(guestsTable)
-    .values({ name, phone, email, token })
+    .values({ name, phone, email, invitationCode, token })
     .returning();
   res.status(201).json(serializeGuest(guest, req));
 });
@@ -207,10 +211,13 @@ router.post("/admin/import", async (req, res) => {
   const guests = await db.transaction(async (tx) => {
     const created = [];
     for (const row of importable) {
-      const token = await createUniqueToken();
+      const [invitationCode, token] = await Promise.all([
+        createUniqueInvitationCode(),
+        createUniqueToken(),
+      ]);
       const [guest] = await tx
         .insert(guestsTable)
-        .values({ name: row.name, phone: row.phone, email: row.email, token })
+        .values({ name: row.name, phone: row.phone, email: row.email, invitationCode, token })
         .returning();
       created.push(guest);
     }

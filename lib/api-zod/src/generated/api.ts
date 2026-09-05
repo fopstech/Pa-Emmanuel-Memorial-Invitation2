@@ -27,19 +27,21 @@ export const GetEventResponse = zod.object({
   "date": zod.string(),
   "time": zod.string(),
   "isoStart": zod.string().optional(),
-  "isoEnd": zod.string().optional()
+  "isoEnd": zod.string().optional(),
+  "venue": zod.string(),
+  "directionsUrl": zod.string().optional()
 }),
   "burial": zod.object({
   "label": zod.string(),
   "date": zod.string(),
   "time": zod.string(),
   "isoStart": zod.string().optional(),
-  "isoEnd": zod.string().optional()
-}),
+  "isoEnd": zod.string().optional(),
   "venue": zod.string(),
+  "directionsUrl": zod.string().optional()
+}),
   "dressCode": zod.string(),
-  "directionsUrl": zod.string().optional(),
-  "clothingImageUrl": zod.string().optional()
+  "photos": zod.array(zod.string())
 })
 
 
@@ -67,22 +69,25 @@ export const GetInvitationResponse = zod.object({
   "date": zod.string(),
   "time": zod.string(),
   "isoStart": zod.string().optional(),
-  "isoEnd": zod.string().optional()
+  "isoEnd": zod.string().optional(),
+  "venue": zod.string(),
+  "directionsUrl": zod.string().optional()
 }),
   "burial": zod.object({
   "label": zod.string(),
   "date": zod.string(),
   "time": zod.string(),
   "isoStart": zod.string().optional(),
-  "isoEnd": zod.string().optional()
-}),
+  "isoEnd": zod.string().optional(),
   "venue": zod.string(),
+  "directionsUrl": zod.string().optional()
+}),
   "dressCode": zod.string(),
-  "directionsUrl": zod.string().optional(),
-  "clothingImageUrl": zod.string().optional()
+  "photos": zod.array(zod.string())
 }),
   "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
-  "checkedIn": zod.boolean()
+  "checkedIn": zod.boolean(),
+  "checkedInAt": zod.string().nullable()
 })
 
 
@@ -114,22 +119,45 @@ export const UpdateRsvpResponse = zod.object({
   "date": zod.string(),
   "time": zod.string(),
   "isoStart": zod.string().optional(),
-  "isoEnd": zod.string().optional()
+  "isoEnd": zod.string().optional(),
+  "venue": zod.string(),
+  "directionsUrl": zod.string().optional()
 }),
   "burial": zod.object({
   "label": zod.string(),
   "date": zod.string(),
   "time": zod.string(),
   "isoStart": zod.string().optional(),
-  "isoEnd": zod.string().optional()
-}),
+  "isoEnd": zod.string().optional(),
   "venue": zod.string(),
+  "directionsUrl": zod.string().optional()
+}),
   "dressCode": zod.string(),
-  "directionsUrl": zod.string().optional(),
-  "clothingImageUrl": zod.string().optional()
+  "photos": zod.array(zod.string())
 }),
   "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
-  "checkedIn": zod.boolean()
+  "checkedIn": zod.boolean(),
+  "checkedInAt": zod.string().nullable()
+})
+
+
+/**
+ * @summary Allow a guest to check themselves in
+ */
+export const checkInInvitationPathTokenMin = 20;
+export const checkInInvitationPathTokenMax = 128;
+
+
+
+export const CheckInInvitationParams = zod.object({
+  "token": zod.coerce.string().min(checkInInvitationPathTokenMin).max(checkInInvitationPathTokenMax)
+})
+
+export const CheckInInvitationResponse = zod.object({
+  "result": zod.enum(['successful', 'already_checked_in', 'invalid']),
+  "guestName": zod.string().nullable(),
+  "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
+  "checkedInAt": zod.string().nullish()
 })
 
 
@@ -154,15 +182,44 @@ export const CheckInGuestResponse = zod.object({
 
 
 /**
+ * @summary Start an usher session
+ */
+
+
+
+export const UsherLoginBody = zod.object({
+  "accessCode": zod.string().min(1)
+})
+
+export const UsherLoginResponse = zod.object({
+  "authenticated": zod.boolean(),
+  "username": zod.string().nullable()
+})
+
+
+/**
+ * @summary End the usher session
+ */
+export const UsherLogoutResponse = zod.void()
+
+
+/**
+ * @summary Get the current usher session
+ */
+export const GetUsherSessionResponse = zod.object({
+  "authenticated": zod.boolean(),
+  "username": zod.string().nullable()
+})
+
+
+/**
  * @summary Start an administrator session
  */
 
 
 
-
 export const AdminLoginBody = zod.object({
-  "username": zod.string().min(1),
-  "password": zod.string().min(1)
+  "accessCode": zod.string().min(1)
 })
 
 export const AdminLoginResponse = zod.object({
@@ -213,6 +270,7 @@ export const ListGuestsResponseItem = zod.object({
   "name": zod.string(),
   "phone": zod.string().nullish(),
   "email": zod.string().nullish(),
+  "invitationCode": zod.string(),
   "token": zod.string(),
   "invitationUrl": zod.string(),
   "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
@@ -244,6 +302,7 @@ export const CreateGuestResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string().nullish(),
   "email": zod.string().nullish(),
+  "invitationCode": zod.string(),
   "token": zod.string(),
   "invitationUrl": zod.string(),
   "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
@@ -269,6 +328,7 @@ export const GetGuestResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string().nullish(),
   "email": zod.string().nullish(),
+  "invitationCode": zod.string(),
   "token": zod.string(),
   "invitationUrl": zod.string(),
   "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
@@ -306,6 +366,7 @@ export const UpdateGuestResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string().nullish(),
   "email": zod.string().nullish(),
+  "invitationCode": zod.string(),
   "token": zod.string(),
   "invitationUrl": zod.string(),
   "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
@@ -377,6 +438,7 @@ export const ImportGuestsResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string().nullish(),
   "email": zod.string().nullish(),
+  "invitationCode": zod.string(),
   "token": zod.string(),
   "invitationUrl": zod.string(),
   "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),

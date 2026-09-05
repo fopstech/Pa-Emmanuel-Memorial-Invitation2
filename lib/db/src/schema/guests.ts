@@ -18,6 +18,7 @@ export const guestsTable = pgTable(
     name: varchar("name", { length: 160 }).notNull(),
     phone: varchar("phone", { length: 80 }),
     email: varchar("email", { length: 320 }),
+    invitationCode: varchar("invitation_code", { length: 64 }).notNull(),
     token: varchar("token", { length: 128 }).notNull(),
     rsvpStatus: varchar("rsvp_status", {
       length: 20,
@@ -37,6 +38,7 @@ export const guestsTable = pgTable(
   },
   (table) => ({
     tokenUnique: uniqueIndex("memorial_guests_token_unique").on(table.token),
+    invitationCodeUnique: uniqueIndex("memorial_guests_invitation_code_unique").on(table.invitationCode),
     nameIndex: index("memorial_guests_name_idx").on(table.name),
     rsvpIndex: index("memorial_guests_rsvp_idx").on(table.rsvpStatus),
     checkInIndex: index("memorial_guests_checked_in_idx").on(table.checkedIn),
@@ -45,6 +47,7 @@ export const guestsTable = pgTable(
 
 export const insertGuestSchema = createInsertSchema(guestsTable).omit({
   id: true,
+  invitationCode: true,
   token: true,
   rsvpStatus: true,
   checkedIn: true,

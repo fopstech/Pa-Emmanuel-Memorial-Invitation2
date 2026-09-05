@@ -7,6 +7,9 @@ export const memorialEvent = {
     time: "4:00 PM",
     isoStart: "2026-10-15T16:00:00+01:00",
     isoEnd: "2026-10-15T20:00:00+01:00",
+    venue: "CGCC Citadel Global Community Church",
+    directionsUrl:
+      "https://www.google.com/maps/search/?api=1&query=CGCC+Citadel+Global+Community+Church",
   },
   burial: {
     label: "Burial",
@@ -14,12 +17,12 @@ export const memorialEvent = {
     time: "2:00 PM",
     isoStart: "2026-10-16T14:00:00+01:00",
     isoEnd: "2026-10-16T18:00:00+01:00",
+    venue: "Ronnie D Event / Ronnie D'Events",
+    directionsUrl:
+      "https://www.google.com/maps/search/?api=1&query=Ronnie+D+Events",
   },
-  venue: "CGCC Citadel Global Community Church",
   dressCode: "Purple",
-  directionsUrl:
-    "https://www.google.com/maps/search/?api=1&query=CGCC+Citadel+Global+Community+Church",
-  clothingImageUrl: "/memorial-purple-clothing.svg",
+  photos: ["/memorial-main.jpg", "/memorial-gallery.jpg"],
 } as const;
 
 export type MemorialEvent = typeof memorialEvent;

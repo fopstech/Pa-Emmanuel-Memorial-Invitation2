@@ -7,7 +7,7 @@ import {
 } from "@workspace/api-zod";
 import { db, guestsTable } from "@workspace/db";
 import { memorialEvent } from "../lib/event";
-import { findGuestByToken, serializeInvitation } from "../lib/guest-utils";
+import { checkInGuest, findGuestByToken, serializeInvitation } from "../lib/guest-utils";
 
 const router: IRouter = Router();
 
@@ -39,6 +39,11 @@ router.patch("/invitations/:token/rsvp", async (req, res) => {
     return;
   }
   res.json(serializeInvitation(guest, req));
+});
+
+router.post("/invitations/:token/check-in", async (req, res) => {
+  const { token } = GetInvitationParams.parse(req.params);
+  res.json(await checkInGuest(token));
 });
 
 export default router;

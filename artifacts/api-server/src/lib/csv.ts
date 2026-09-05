@@ -8,6 +8,7 @@ export type ParsedGuestRow = {
 };
 
 export function parseCsv(text: string) {
+  const delimiter = text.split(/\r?\n/, 1)[0]?.includes("\t") ? "\t" : ",";
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = "";
@@ -21,7 +22,7 @@ export function parseCsv(text: string) {
       index += 1;
     } else if (character === '"') {
       quoted = !quoted;
-    } else if (character === "," && !quoted) {
+    } else if (character === delimiter && !quoted) {
       row.push(cell.trim());
       cell = "";
     } else if ((character === "\n" || character === "\r") && !quoted) {
@@ -44,7 +45,7 @@ export function parseCsv(text: string) {
 
 export function parseGuestCsv(text: string) {
   const allRows = parseCsv(text);
-  const headers = (allRows.shift() ?? []).map((header) => normalize(header));
+  const headers = (allRows.shift() ?? []).map((header) => normalize(header.replace(/^\uFEFF/, "")));
   const nameIndex = headers.findIndex((header) => header === "name" || header === "guest name");
   const phoneIndex = headers.findIndex((header) => header === "phone" || header === "phone number");
   const emailIndex = headers.findIndex((header) => header === "email" || header === "email address");

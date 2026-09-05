@@ -6,12 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface EventOccurrence {
-  label: string;
-  date: string;
-  time: string;
-  isoStart?: string;
-  isoEnd?: string;
-  venue: string;
-  directionsUrl?: string;
+export interface AccessCodeInput {
+  /** @minLength 1 */
+  accessCode: string;
 }

@@ -1,0 +1,493 @@
+FINALIZE AND FIX THE PA EMMANUEL MEMORIAL INVITATION APP.
+
+Do NOT rebuild the project from scratch.
+Inspect everything already built, preserve working features, and fix/complete the application.
+
+IMPORTANT: Do not remove existing working RSVP, database, QR, guest, or admin functionality.
+
+==================================================
+1. ADMIN ACCESS — MUST WORK
+==================================================
+
+Create/fix:
+
+/admin
+
+The admin access code is:
+
+2011
+
+When the user visits /admin:
+- show a clean admin access screen
+- ask for the admin access code
+- code 2011 grants access
+- incorrect code shows an error
+- create a secure server-side session after successful access
+- do NOT expose the code in frontend JavaScript
+- do NOT store it in localStorage as the authentication mechanism
+
+The admin must be able to log out.
+
+The admin dashboard must actually load after entering 2011.
+
+==================================================
+2. USHER CHECK-IN ACCESS
+==================================================
+
+Create/fix:
+
+/check-in
+
+The usher access code is:
+
+30
+
+When an usher opens /check-in:
+- show an usher access screen
+- enter code 30
+- successful authentication opens the check-in scanner
+- incorrect code shows an error
+- use a secure server-side session
+- do NOT expose the code in frontend JavaScript
+
+After access, the usher can:
+
+A. Scan a guest's unique QR code using the phone camera.
+
+B. Manually enter the guest's invitation code.
+
+Both methods must perform the SAME check-in operation.
+
+==================================================
+3. GUEST SELF CHECK-IN
+==================================================
+
+Guests must NOT need an account.
+
+On their unique invitation page:
+
+/invite/:token
+
+Allow the guest to:
+- view their invitation
+- RSVP
+- choose attending/not attending
+- optionally check themselves in when appropriate
+
+Add a clear:
+
+"Check In"
+
+button.
+
+When a guest checks themselves in:
+- validate their invitation token
+- mark them checked in
+- save check-in timestamp
+- prevent duplicate check-in
+
+If already checked in:
+show:
+"Already Checked In"
+
+and display the existing check-in time.
+
+Keep usher QR/manual check-in as a backup.
+
+==================================================
+4. MANUAL ADD GUEST
+==================================================
+
+Inside /admin add:
+
+"Add Guest"
+
+Admin can manually enter:
+
+Guest Name
+Phone (optional)
+Email (optional)
+
+Name is required.
+
+When saved:
+- create the guest in the database
+- automatically generate a unique invitation code
+- automatically generate a unique invitation token
+- automatically create the guest invitation URL
+- automatically generate that guest's QR code
+
+Do NOT make the admin manually create codes.
+
+==================================================
+5. PASTE SPREADSHEET DATA
+==================================================
+
+The admin must have TWO ways to import guests:
+
+A. Upload CSV
+
+B. PASTE spreadsheet data directly into a text box.
+
+For pasted spreadsheet data, support normal spreadsheet/tab-separated data.
+
+Example:
+
+Name    Phone    Email
+John Doe    08012345678    john@example.com
+Mary Doe    08098765432    mary@example.com
+Peter Doe    08011112222    peter@example.com
+
+When pasted:
+- automatically separate the columns
+- detect the header row
+- display a preview table
+- identify invalid rows
+- allow admin to confirm import
+- create each guest separately
+- generate a unique invitation code for every guest
+- generate a unique invitation URL for every guest
+- generate a unique QR code for every guest
+- prevent accidental duplicate imports
+
+Do NOT require email.
+
+Do NOT create guest login accounts.
+
+==================================================
+6. GUEST CODES
+==================================================
+
+Every guest must have a unique invitation code.
+
+Example:
+
+PMA-001
+PMA-002
+PMA-003
+
+OR another secure unique format.
+
+Codes must never be duplicated.
+
+The admin dashboard must show each guest's:
+
+Name
+Invitation Code
+Invitation Link
+RSVP
+Check-in status
+QR
+
+Admin can:
+- copy invitation link
+- copy invitation code
+- view QR
+- download QR
+- print QR
+
+==================================================
+7. ADMIN GUEST MANAGEMENT
+==================================================
+
+Admin dashboard must have:
+
+Total Guests
+Attending
+Not Attending
+Pending
+Checked In
+Not Checked In
+
+Guest management:
+
+Search
+Filter
+Add
+Edit
+Delete
+View
+Copy invitation
+View QR
+Download QR
+Print QR
+
+Make it work on mobile too.
+
+==================================================
+8. UNIQUE QR SYSTEM
+==================================================
+
+Every guest gets a DIFFERENT QR code.
+
+Do NOT create one QR for everyone.
+
+The QR must identify the guest securely.
+
+Scanning a QR through /check-in must:
+
+1. Validate the invitation.
+2. Find the correct guest.
+3. Check whether they already checked in.
+4. If not checked in:
+   mark checked in and save timestamp.
+5. Show:
+
+CHECK-IN SUCCESSFUL
+
+Guest Name:
+[Name]
+
+Time:
+[Time]
+
+If already checked in:
+
+ALREADY CHECKED IN
+
+Guest:
+[Name]
+
+Checked in:
+[Original time]
+
+==================================================
+9. EVENT VENUES — IMPORTANT
+==================================================
+
+Use the correct venue for each event.
+
+WAKE KEEP:
+
+October 15, 2026
+4:00 PM
+CGCC Citadel Global Community Church
+
+BURIAL:
+
+October 16, 2026
+2:00 PM
+Ronnie D Event / Ronnie D'Events
+
+Do NOT display CGCC as the burial venue.
+
+Do NOT display Ronnie D Event as the wake-keep venue.
+
+Clearly separate them.
+
+==================================================
+10. EVENT DESIGN
+==================================================
+
+Make the invitation look like a premium memorial invitation.
+
+Theme:
+Elegant purple
+Respectful
+Clean
+Modern
+Premium
+Mobile-first
+
+Show:
+
+PA EMMANUEL
+MEMORIAL INVITATION
+
+Include:
+- person's name
+- wake keep
+- burial
+- venues
+- dates
+- times
+- dress code
+- RSVP
+- guest-specific welcome
+
+Dress code:
+
+PURPLE
+
+==================================================
+11. PHOTOS
+==================================================
+
+I will upload photographs for the memorial.
+
+When I upload them:
+- actually use the uploaded photographs in the website
+- create a beautiful memorial photo section
+- preserve the photographs without unnecessary distortion
+- make them responsive on mobile and desktop
+- use appropriate cropping/object-fit so important parts are not cut off
+- do not invent replacement people/photos
+- make the main memorial photograph prominent
+- allow the gallery to contain multiple uploaded photographs
+
+Make the photo section elegant and respectful.
+
+Do not use random stock people as replacements for my uploaded photos.
+
+==================================================
+12. PUBLIC GUEST EXPERIENCE
+==================================================
+
+Guests must NEVER be asked to:
+- create an account
+- log in
+- enter email/password
+- verify email
+- enter OTP
+
+Their invitation link should simply open their personalized invitation.
+
+Example:
+
+/invite/PMA-ABC123
+
+Show:
+
+Welcome, [Guest Name]
+
+Then the invitation.
+
+==================================================
+13. DATABASE
+==================================================
+
+Verify the database is actually persistent.
+
+Guest fields should include at minimum:
+
+id
+name
+phone
+email
+invitationCode
+token
+rsvpStatus
+checkedIn
+checkedInAt
+createdAt
+updatedAt
+
+Use proper uniqueness constraints for invitationCode/token.
+
+Do not use localStorage as the main database.
+
+==================================================
+14. SECURITY
+==================================================
+
+Admin code:
+2011
+
+Usher code:
+30
+
+These must be handled server-side.
+
+Do not put either code in publicly accessible frontend source.
+
+Do not expose database credentials.
+
+Do not expose API keys.
+
+Do not commit secrets to GitHub.
+
+Use environment variables/secrets where appropriate.
+
+==================================================
+15. MOBILE CHECK-IN
+==================================================
+
+The usher will mainly use an Android phone.
+
+Make /check-in extremely mobile-friendly.
+
+Camera scanner should:
+- request camera permission
+- open the phone camera
+- scan QR codes
+- work without a separate QR scanner app
+- have manual code entry underneath
+
+If camera permission is denied, manual entry must still work.
+
+==================================================
+16. FINAL TEST
+==================================================
+
+Before saying the project is finished, test ALL of this:
+
+ADMIN:
+1. Open /admin
+2. Enter 2011
+3. Admin dashboard opens
+4. Add a guest
+5. Guest gets unique code
+6. Guest gets unique link
+7. Guest gets QR
+8. Edit guest
+9. Delete guest
+10. Search guest
+11. Dashboard counts update
+
+SPREADSHEET:
+12. Paste spreadsheet data
+13. Columns separate correctly
+14. Preview appears
+15. Confirm import
+16. Multiple guests are created
+17. Every guest gets a different code
+18. Every guest gets a different QR
+19. Duplicate import is handled
+
+GUEST:
+20. Open guest invitation link
+21. Guest name appears
+22. RSVP works
+23. RSVP persists after refresh
+24. Guest can self-check-in
+25. Duplicate self-check-in is prevented
+
+USHER:
+26. Open /check-in
+27. Enter 30
+28. Scanner opens
+29. Scan guest QR
+30. Successful check-in appears
+31. Scan same QR again
+32. "Already Checked In" appears
+33. Manually enter invitation code
+34. Manual check-in works
+
+EVENT:
+35. Wake Keep shows CGCC Citadel Global Community Church
+36. Burial shows Ronnie D Event / Ronnie D'Events
+37. Dates and times are correct
+38. Purple dress code appears
+39. Uploaded memorial photographs display correctly
+
+BUILD:
+40. Run typecheck
+41. Run production build
+42. Fix EVERY build/runtime error
+43. Test all routes directly
+44. Confirm database persists
+45. Confirm no secrets are committed
+46. Confirm the final app works on mobile
+
+DO NOT STOP AT A UI MOCKUP.
+EVERYTHING ABOVE MUST ACTUALLY WORK.
+
+When finished, give me a short summary of:
+- what was fixed
+- admin access
+- usher access
+- guest import
+- QR system
+- self-check-in
+- database
+- any remaining issue

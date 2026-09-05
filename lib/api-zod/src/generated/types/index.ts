@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './accessCodeInput';
 export * from './adminLoginInput';
 export * from './adminSession';
 export * from './badRequestResponse';
