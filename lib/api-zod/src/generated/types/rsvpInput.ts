@@ -5,7 +5,8 @@
  * API for the Pa Emmanuel Ayodele Abatan memorial invitation
  * OpenAPI spec version: 0.1.0
  */
+import type { RsvpInputStatus } from './rsvpInputStatus';
 
-export interface HealthStatus {
-  status: string;
+export interface RsvpInput {
+  status: RsvpInputStatus;
 }

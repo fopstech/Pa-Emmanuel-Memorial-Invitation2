@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface CheckInInput {
+  /**
+     * @minLength 4
+     * @maxLength 256
+     */
+  invitationCode: string;
 }

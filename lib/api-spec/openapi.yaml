@@ -3,20 +3,27 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: API for the Pa Emmanuel Ayodele Abatan memorial invitation
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: invitation
+    description: Public memorial invitation and RSVP
+  - name: check-in
+    description: Usher check-in operations
+  - name: admin-auth
+    description: Protected administrator session
+  - name: admin
+    description: Protected guest administration
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +31,580 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /event:
+    get:
+      operationId: getEvent
+      tags: [invitation]
+      summary: Get memorial event details
+      responses:
+        "200":
+          description: Memorial event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+  /invitations/{token}:
+    get:
+      operationId: getInvitation
+      tags: [invitation]
+      summary: Get the guest invitation for a private token
+      parameters:
+        - $ref: "#/components/parameters/InvitationToken"
+      responses:
+        "200":
+          description: Guest invitation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invitation"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /invitations/{token}/rsvp:
+    patch:
+      operationId: updateRsvp
+      tags: [invitation]
+      summary: Save or update a guest RSVP
+      parameters:
+        - $ref: "#/components/parameters/InvitationToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RsvpInput"
+      responses:
+        "200":
+          description: Updated invitation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invitation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /check-in:
+    post:
+      operationId: checkInGuest
+      tags: [check-in]
+      summary: Check in a guest with an invitation code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckInInput"
+      responses:
+        "200":
+          description: Check-in result, including already-checked-in state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckInResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin-auth]
+      summary: Start an administrator session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Authenticated administrator session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin-auth]
+      summary: End the administrator session
+      responses:
+        "204":
+          description: Session ended
+  /admin/session:
+    get:
+      operationId: getAdminSession
+      tags: [admin-auth]
+      summary: Get the current administrator session
+      responses:
+        "200":
+          description: Current session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /admin/dashboard:
+    get:
+      operationId: getAdminDashboard
+      tags: [admin]
+      summary: Get guest dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /admin/guests:
+    get:
+      operationId: listGuests
+      tags: [admin]
+      summary: List and filter guests
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: rsvpStatus
+          in: query
+          schema:
+            $ref: "#/components/schemas/RsvpStatus"
+        - name: checkInStatus
+          in: query
+          schema:
+            $ref: "#/components/schemas/CheckInFilter"
+      responses:
+        "200":
+          description: Guests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Guest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: createGuest
+      tags: [admin]
+      summary: Create a guest and unique invitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuestInput"
+      responses:
+        "201":
+          description: Created guest
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guest"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /admin/guests/{id}:
+    get:
+      operationId: getGuest
+      tags: [admin]
+      summary: Get one guest
+      parameters:
+        - $ref: "#/components/parameters/GuestId"
+      responses:
+        "200":
+          description: Guest
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateGuest
+      tags: [admin]
+      summary: Update a guest
+      parameters:
+        - $ref: "#/components/parameters/GuestId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuestUpdate"
+      responses:
+        "200":
+          description: Updated guest
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guest"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: deleteGuest
+      tags: [admin]
+      summary: Delete a guest
+      parameters:
+        - $ref: "#/components/parameters/GuestId"
+      responses:
+        "204":
+          description: Guest deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /admin/import/preview:
+    post:
+      operationId: previewGuestImport
+      tags: [admin]
+      summary: Validate and preview a CSV guest import
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CsvImportInput"
+      responses:
+        "200":
+          description: Import preview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CsvImportPreview"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /admin/import:
+    post:
+      operationId: importGuests
+      tags: [admin]
+      summary: Import valid guests from a CSV
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CsvImportInput"
+      responses:
+        "200":
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CsvImportResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 components:
+  securitySchemes:
+    adminSession:
+      type: apiKey
+      in: cookie
+      name: memorial_admin
+  parameters:
+    InvitationToken:
+      name: token
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 20
+        maxLength: 128
+    GuestId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Administrator authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Conflict:
+      description: Duplicate or conflicting resource
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ServiceUnavailable:
+      description: Required server configuration is missing
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
-      required:
-        - status
-
+      required: [status]
+    Event:
+      type: object
+      required: [name, title, wakeKeep, burial, venue, dressCode]
+      properties:
+        name:
+          type: string
+        title:
+          type: string
+        wakeKeep:
+          $ref: "#/components/schemas/EventOccurrence"
+        burial:
+          $ref: "#/components/schemas/EventOccurrence"
+        venue:
+          type: string
+        dressCode:
+          type: string
+        directionsUrl:
+          type: string
+        clothingImageUrl:
+          type: string
+    EventOccurrence:
+      type: object
+      required: [date, time, label]
+      properties:
+        label:
+          type: string
+        date:
+          type: string
+        time:
+          type: string
+        isoStart:
+          type: string
+        isoEnd:
+          type: string
+    RsvpStatus:
+      type: string
+      enum: [pending, attending, not_attending]
+    CheckInFilter:
+      type: string
+      enum: [all, checked_in, not_checked_in]
+    Guest:
+      type: object
+      required: [id, name, token, invitationUrl, rsvpStatus, checkedIn, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        token:
+          type: string
+        invitationUrl:
+          type: string
+        rsvpStatus:
+          $ref: "#/components/schemas/RsvpStatus"
+        checkedIn:
+          type: boolean
+        checkedInAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    Invitation:
+      type: object
+      required: [name, token, invitationUrl, event, rsvpStatus, checkedIn]
+      properties:
+        name:
+          type: string
+        token:
+          type: string
+        invitationUrl:
+          type: string
+        event:
+          $ref: "#/components/schemas/Event"
+        rsvpStatus:
+          $ref: "#/components/schemas/RsvpStatus"
+        checkedIn:
+          type: boolean
+    GuestInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        phone:
+          type: string
+          maxLength: 80
+        email:
+          type: string
+          format: email
+    GuestUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        phone:
+          type: ["string", "null"]
+          maxLength: 80
+        email:
+          type: ["string", "null"]
+          format: email
+    RsvpInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [attending, not_attending]
+    CheckInInput:
+      type: object
+      required: [invitationCode]
+      properties:
+        invitationCode:
+          type: string
+          minLength: 4
+          maxLength: 256
+    CheckInResult:
+      type: object
+      required: [result, guestName, rsvpStatus]
+      properties:
+        result:
+          type: string
+          enum: [successful, already_checked_in, invalid]
+        guestName:
+          type: ["string", "null"]
+        rsvpStatus:
+          $ref: "#/components/schemas/RsvpStatus"
+        checkedInAt:
+          type: ["string", "null"]
+    AdminLoginInput:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+    AdminSession:
+      type: object
+      required: [authenticated, username]
+      properties:
+        authenticated:
+          type: boolean
+        username:
+          type: ["string", "null"]
+    DashboardSummary:
+      type: object
+      required: [totalGuests, attending, notAttending, pendingRsvp, checkedIn, notCheckedIn]
+      properties:
+        totalGuests:
+          type: integer
+        attending:
+          type: integer
+        notAttending:
+          type: integer
+        pendingRsvp:
+          type: integer
+        checkedIn:
+          type: integer
+        notCheckedIn:
+          type: integer
+    CsvImportInput:
+      type: object
+      required: [csvText]
+      properties:
+        csvText:
+          type: string
+          minLength: 1
+          maxLength: 2000000
+    CsvImportRow:
+      type: object
+      required: [rowNumber, name, valid, duplicate]
+      properties:
+        rowNumber:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        valid:
+          type: boolean
+        duplicate:
+          type: boolean
+        error:
+          type: ["string", "null"]
+    CsvImportPreview:
+      type: object
+      required: [headers, rows, validCount, invalidCount, duplicateCount]
+      properties:
+        headers:
+          type: array
+          items:
+            type: string
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/CsvImportRow"
+        validCount:
+          type: integer
+        invalidCount:
+          type: integer
+        duplicateCount:
+          type: integer
+    CsvImportResult:
+      type: object
+      required: [importedCount, skippedCount, invalidCount, guests]
+      properties:
+        importedCount:
+          type: integer
+        skippedCount:
+          type: integer
+        invalidCount:
+          type: integer
+        guests:
+          type: array
+          items:
+            $ref: "#/components/schemas/Guest"
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string

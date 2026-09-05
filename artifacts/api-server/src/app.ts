@@ -1,5 +1,6 @@
-import express, { type Express } from "express";
+import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
@@ -26,9 +27,23 @@ app.use(
   }),
 );
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+app.use((error: unknown, _req: Request, res: Response, next: NextFunction) => {
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+  if (error && typeof error === "object" && "issues" in error) {
+    res.status(400).json({ error: "Invalid request." });
+    return;
+  }
+  logger.error({ err: error }, "Unhandled request error");
+  res.status(500).json({ error: "Something went wrong on the server." });
+});
 
 export default app;

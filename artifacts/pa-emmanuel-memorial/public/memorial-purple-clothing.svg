@@ -1,0 +1,18 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Purple clothing for the memorial service</title>
+  <desc id="desc">A quiet editorial illustration of folded purple fabric and a soft lavender garment.</desc>
+  <rect width="1200" height="360" fill="#E7E0D1"/>
+  <circle cx="1010" cy="58" r="190" fill="#D5C8DA"/>
+  <path d="M552 96C552 68 575 45 603 45C631 45 654 68 654 96V111C654 127 667 140 683 140H727C748 140 765 157 765 178V306H441V178C441 157 458 140 479 140H523C539 140 552 127 552 111V96Z" fill="#5D346F"/>
+  <path d="M603 45C590 45 579 57 579 71C579 84 590 96 603 96C616 96 627 84 627 71C627 57 616 45 603 45Z" fill="#B09ABC"/>
+  <path d="M530 140H676L740 306H466L530 140Z" fill="#7C4A8E"/>
+  <path d="M530 140L467 306H441V178C441 157 458 140 479 140H530Z" fill="#4D2A5F"/>
+  <path d="M676 140L739 306H765V178C765 157 748 140 727 140H676Z" fill="#4D2A5F"/>
+  <path d="M478 255H730V306H478V255Z" fill="#B28EBC"/>
+  <path d="M150 265C150 250 162 238 177 238H330C345 238 357 250 357 265V306H150V265Z" fill="#6C3C7B"/>
+  <path d="M126 306L162 216H345L381 306H126Z" fill="#845394"/>
+  <path d="M162 216H345L328 259H179L162 216Z" fill="#B89AC3"/>
+  <path d="M850 306L885 214H1089L1124 306H850Z" fill="#745080"/>
+  <path d="M885 214H1089L1075 251H899L885 214Z" fill="#A889B5"/>
+  <path d="M0 306H1200V360H0V306Z" fill="#D8CEBD"/>
+</svg>

@@ -5,7 +5,11 @@
  * API for the Pa Emmanuel Ayodele Abatan memorial invitation
  * OpenAPI spec version: 0.1.0
  */
+import type { Guest } from './guest';
 
-export interface HealthStatus {
-  status: string;
+export interface CsvImportResult {
+  importedCount: number;
+  skippedCount: number;
+  invalidCount: number;
+  guests: Guest[];
 }
