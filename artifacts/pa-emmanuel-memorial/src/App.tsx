@@ -210,6 +210,9 @@ function HomePage() {
   return (
     <div className="paper-grain min-h-[100dvh] bg-background">
       <section className="relative flex min-h-[min(780px,100dvh)] items-end overflow-hidden bg-primary px-5 pb-16 pt-32 text-primary-foreground sm:px-8 lg:px-12">
+        <img src={memorialPortrait} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover object-center opacity-20 grayscale" />
+        <div className="absolute inset-0 bg-primary/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/60" />
         <PublicHeader />
         <div className="absolute -right-24 -top-28 size-[480px] rounded-full border border-accent/20" />
         <div className="absolute -right-8 -top-12 size-[320px] rounded-full border border-accent/15" />
