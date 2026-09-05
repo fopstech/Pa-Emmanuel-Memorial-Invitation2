@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Pa Emmanuel Memorial Invitation"
+description = "A premium passwordless memorial invitation app with guest-specific links and QR codes, RSVP tracking, usher check-in, CSV guest import, and a protected admin workspace."
+version = "1.0.0"
+id = "artifacts/pa-emmanuel-memorial"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19896
+
+[services.development]
+run = "pnpm --filter @workspace/pa-emmanuel-memorial run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/pa-emmanuel-memorial", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/pa-emmanuel-memorial/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19896"
+BASE_PATH = "/"
