@@ -84,6 +84,7 @@ const errorMessage = (error: unknown) => {
 
 const statusLabel = (status: RsvpStatus) => status === 'attending' ? 'Attending' : status === 'not_attending' ? 'Unable to attend' : 'Awaiting reply';
 const initials = (name: string) => name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+const memorialPortrait = '/memorial-main.jpg';
 
 function downloadCalendar(event: Event, kind: 'wakeKeep' | 'burial') {
   const occurrence = event[kind];
@@ -115,8 +116,8 @@ function downloadCalendar(event: Event, kind: 'wakeKeep' | 'burial') {
 function Wordmark({ light = false }: { light?: boolean }) {
   return (
     <Link href="/" data-testid="link-wordmark" className={`group inline-flex items-center gap-3 ${light ? 'text-[hsl(var(--sidebar-foreground))]' : 'text-foreground'}`}>
-      <span className={`grid h-10 w-10 place-items-center rounded-full border ${light ? 'border-[hsl(var(--accent))]/50 bg-[hsl(var(--accent))]/10' : 'border-primary/20 bg-primary text-primary-foreground'}`}>
-        <span className="serif text-2xl leading-none">P</span>
+      <span className={`h-10 w-10 overflow-hidden rounded-full border p-0.5 ${light ? 'border-[hsl(var(--accent))]/60 bg-[hsl(var(--accent))]/10' : 'border-primary/20 bg-primary'}`}>
+        <img src={memorialPortrait} alt="Pa Emmanuel Ayodele Abatan" className="h-full w-full rounded-full object-cover object-top" />
       </span>
       <span className="leading-tight">
         <span className="block text-[10px] font-semibold uppercase tracking-[.28em] opacity-70">A family memorial</span>
@@ -156,8 +157,12 @@ function PublicHeader() {
         <a href="#service" data-testid="link-service" className="transition-colors hover:text-[hsl(var(--accent))]">The service</a>
         <a href="#details" data-testid="link-details" className="transition-colors hover:text-[hsl(var(--accent))]">Details</a>
         <Link href="/check-in" data-testid="link-check-in" className="transition-colors hover:text-[hsl(var(--accent))]">Check in</Link>
+        <Link href="/admin" data-testid="link-header-admin" className="transition-colors hover:text-[hsl(var(--accent))]">Admin dashboard</Link>
       </nav>
-      <Link href="/check-in" data-testid="link-header-check-in" className="rounded-full border border-[hsl(var(--sidebar-foreground))]/25 px-4 py-2 text-[10px] font-semibold uppercase tracking-[.16em] text-[hsl(var(--sidebar-foreground))] transition-colors hover:border-[hsl(var(--accent))] hover:text-[hsl(var(--accent))] sm:hidden">Check in</Link>
+      <div className="flex items-center gap-2 sm:hidden">
+        <Link href="/admin" data-testid="link-header-admin-mobile" className="rounded-full border border-[hsl(var(--sidebar-foreground))]/25 px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-[hsl(var(--sidebar-foreground))] transition-colors hover:border-[hsl(var(--accent))] hover:text-[hsl(var(--accent))]">Admin</Link>
+        <Link href="/check-in" data-testid="link-header-check-in" className="rounded-full border border-[hsl(var(--sidebar-foreground))]/25 px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-[hsl(var(--sidebar-foreground))] transition-colors hover:border-[hsl(var(--accent))] hover:text-[hsl(var(--accent))]">Check in</Link>
+      </div>
     </header>
   );
 }
@@ -216,10 +221,16 @@ function HomePage() {
             <p className="reveal-up reveal-delay-2 mt-9 max-w-lg text-base leading-7 text-primary-foreground/70">{event.title}. A quiet invitation to gather, to pray, and to share the stories that keep a beloved life close.</p>
             <a href="#details" data-testid="link-scroll-details" className="reveal-up reveal-delay-3 mt-9 inline-flex items-center gap-3 border-b border-accent pb-2 text-xs font-semibold uppercase tracking-[.18em] text-accent">See the details <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></a>
           </div>
-          <div className="reveal-up reveal-delay-4 max-w-sm justify-self-end border border-primary-foreground/15 bg-primary-foreground/5 p-7 backdrop-blur-sm">
-            <div className="flex items-center justify-between border-b border-primary-foreground/15 pb-5"><span className="mono text-[10px] uppercase tracking-[.22em] text-primary-foreground/60">You are remembered</span><Heart className="size-4 text-accent" fill="currentColor" /></div>
-            <p className="serif mt-6 text-3xl leading-tight">“The measure of a life is not in its length, but in the love it leaves behind.”</p>
-            <p className="mt-5 text-xs uppercase tracking-[.12em] text-primary-foreground/50">— Family of Pa Emmanuel</p>
+          <div className="reveal-up reveal-delay-4 max-w-sm justify-self-end">
+            <div className="border border-primary-foreground/15 bg-primary-foreground/5 p-3 backdrop-blur-sm">
+              <img src={memorialPortrait} alt={`Portrait of ${event.name}`} className="max-h-[26rem] w-full bg-[#e6dfd2] object-contain object-top" data-testid="img-home-memorial-portrait" />
+              <p className="px-2 pb-2 pt-3 text-[10px] uppercase tracking-[.18em] text-primary-foreground/60">Remembered with love</p>
+            </div>
+            <div className="mt-5 border border-primary-foreground/15 bg-primary-foreground/5 p-7 backdrop-blur-sm">
+              <div className="flex items-center justify-between border-b border-primary-foreground/15 pb-5"><span className="mono text-[10px] uppercase tracking-[.22em] text-primary-foreground/60">You are remembered</span><Heart className="size-4 text-accent" fill="currentColor" /></div>
+              <p className="serif mt-6 text-3xl leading-tight">“The measure of a life is not in its length, but in the love it leaves behind.”</p>
+              <p className="mt-5 text-xs uppercase tracking-[.12em] text-primary-foreground/50">— Family of Pa Emmanuel</p>
+            </div>
           </div>
         </div>
       </section>
@@ -265,14 +276,19 @@ function InvitePage() {
   });
   return (
     <div className="paper-grain min-h-[100dvh] bg-background">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-12"><Wordmark /><Link href="/" data-testid="link-invite-home" className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.17em] text-muted-foreground"><ChevronLeft className="size-4" /> Home</Link></div>
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-12"><Wordmark /><div className="flex items-center gap-4"><Link href="/admin" data-testid="link-invite-admin" className="text-[10px] font-semibold uppercase tracking-[.15em] text-muted-foreground transition-colors hover:text-primary">Admin dashboard</Link><Link href="/" data-testid="link-invite-home" className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.17em] text-muted-foreground"><ChevronLeft className="size-4" /> Home</Link></div></div>
       <main className="mx-auto max-w-5xl px-5 pb-20 pt-12 sm:px-8 lg:px-12">
         <div className="relative overflow-hidden bg-primary px-7 py-14 text-primary-foreground sm:px-14 sm:py-20">
           <div className="absolute -right-20 -top-28 size-72 rounded-full border border-accent/20" />
-          <div className="relative max-w-2xl">
-            <p className="mono text-[10px] uppercase tracking-[.26em] text-accent">A personal invitation for</p>
-            <h1 className="serif mt-5 text-6xl leading-[.88] sm:text-8xl" data-testid="text-invite-name">{invite.name}</h1>
-            <p className="mt-8 text-sm leading-7 text-primary-foreground/70">The family of <span className="text-primary-foreground">{event.name}</span> would be honoured by your presence as we gather in remembrance.</p>
+          <div className="relative grid gap-8 sm:grid-cols-[1fr_.48fr] sm:items-center">
+            <div className="max-w-2xl">
+              <p className="mono text-[10px] uppercase tracking-[.26em] text-accent">A personal invitation for</p>
+              <h1 className="serif mt-5 text-6xl leading-[.88] sm:text-8xl" data-testid="text-invite-name">{invite.name}</h1>
+              <p className="mt-8 text-sm leading-7 text-primary-foreground/70">The family of <span className="text-primary-foreground">{event.name}</span> would be honoured by your presence as we gather in remembrance.</p>
+            </div>
+            <div className="border border-primary-foreground/20 bg-primary-foreground/10 p-2">
+              <img src={memorialPortrait} alt={`Portrait of ${event.name}`} className="max-h-64 w-full bg-[#e6dfd2] object-contain object-top sm:max-h-72" data-testid="img-invitation-memorial-portrait" />
+            </div>
           </div>
         </div>
         <section className="grid gap-10 border-x border-b border-border p-7 sm:grid-cols-[1fr_.8fr] sm:p-12">
