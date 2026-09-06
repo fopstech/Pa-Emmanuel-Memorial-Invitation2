@@ -64,11 +64,10 @@ export function serializeGuest(guest: Guest, req: Request) {
   };
 }
 
-export function serializeInvitation(guest: Guest, req: Request) {
+export function serializeInvitation(guest: Guest, _req: Request) {
   return {
     name: guest.name,
-    token: guest.token,
-    invitationUrl: invitationUrl(guest.token, req),
+    invitationCode: guest.invitationCode,
     event: memorialEvent,
     rsvpStatus: guest.rsvpStatus,
     checkedIn: guest.checkedIn,

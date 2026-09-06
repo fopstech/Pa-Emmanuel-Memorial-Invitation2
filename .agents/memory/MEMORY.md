@@ -1,0 +1,1 @@
+- [Runtime schema bundling](runtime-schema-bundling.md) — generated Zod schemas need the named export for reliable API startup.

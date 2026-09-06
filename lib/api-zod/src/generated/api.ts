@@ -5,7 +5,7 @@
  * API for the Pa Emmanuel Ayodele Abatan memorial invitation
  * OpenAPI spec version: 0.1.0
  */
-import * as zod from 'zod';
+import { z as zod } from 'zod';
 
 
 /**
@@ -29,6 +29,7 @@ export const GetEventResponse = zod.object({
   "isoStart": zod.string().optional(),
   "isoEnd": zod.string().optional(),
   "venue": zod.string(),
+  "dressCode": zod.string(),
   "directionsUrl": zod.string().optional()
 }),
   "burial": zod.object({
@@ -38,9 +39,11 @@ export const GetEventResponse = zod.object({
   "isoStart": zod.string().optional(),
   "isoEnd": zod.string().optional(),
   "venue": zod.string(),
+  "dressCode": zod.string(),
   "directionsUrl": zod.string().optional()
 }),
-  "dressCode": zod.string(),
+  "clothingDeadline": zod.string(),
+  "clothingImage": zod.string(),
   "photos": zod.array(zod.string())
 })
 
@@ -59,8 +62,7 @@ export const GetInvitationParams = zod.object({
 
 export const GetInvitationResponse = zod.object({
   "name": zod.string(),
-  "token": zod.string(),
-  "invitationUrl": zod.string(),
+  "invitationCode": zod.string(),
   "event": zod.object({
   "name": zod.string(),
   "title": zod.string(),
@@ -71,6 +73,7 @@ export const GetInvitationResponse = zod.object({
   "isoStart": zod.string().optional(),
   "isoEnd": zod.string().optional(),
   "venue": zod.string(),
+  "dressCode": zod.string(),
   "directionsUrl": zod.string().optional()
 }),
   "burial": zod.object({
@@ -80,9 +83,11 @@ export const GetInvitationResponse = zod.object({
   "isoStart": zod.string().optional(),
   "isoEnd": zod.string().optional(),
   "venue": zod.string(),
+  "dressCode": zod.string(),
   "directionsUrl": zod.string().optional()
 }),
-  "dressCode": zod.string(),
+  "clothingDeadline": zod.string(),
+  "clothingImage": zod.string(),
   "photos": zod.array(zod.string())
 }),
   "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
@@ -109,8 +114,7 @@ export const UpdateRsvpBody = zod.object({
 
 export const UpdateRsvpResponse = zod.object({
   "name": zod.string(),
-  "token": zod.string(),
-  "invitationUrl": zod.string(),
+  "invitationCode": zod.string(),
   "event": zod.object({
   "name": zod.string(),
   "title": zod.string(),
@@ -121,6 +125,7 @@ export const UpdateRsvpResponse = zod.object({
   "isoStart": zod.string().optional(),
   "isoEnd": zod.string().optional(),
   "venue": zod.string(),
+  "dressCode": zod.string(),
   "directionsUrl": zod.string().optional()
 }),
   "burial": zod.object({
@@ -130,34 +135,16 @@ export const UpdateRsvpResponse = zod.object({
   "isoStart": zod.string().optional(),
   "isoEnd": zod.string().optional(),
   "venue": zod.string(),
+  "dressCode": zod.string(),
   "directionsUrl": zod.string().optional()
 }),
-  "dressCode": zod.string(),
+  "clothingDeadline": zod.string(),
+  "clothingImage": zod.string(),
   "photos": zod.array(zod.string())
 }),
   "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
   "checkedIn": zod.boolean(),
   "checkedInAt": zod.string().nullable()
-})
-
-
-/**
- * @summary Allow a guest to check themselves in
- */
-export const checkInInvitationPathTokenMin = 20;
-export const checkInInvitationPathTokenMax = 128;
-
-
-
-export const CheckInInvitationParams = zod.object({
-  "token": zod.coerce.string().min(checkInInvitationPathTokenMin).max(checkInInvitationPathTokenMax)
-})
-
-export const CheckInInvitationResponse = zod.object({
-  "result": zod.enum(['successful', 'already_checked_in', 'invalid']),
-  "guestName": zod.string().nullable(),
-  "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
-  "checkedInAt": zod.string().nullish()
 })
 
 
@@ -388,6 +375,80 @@ export const DeleteGuestParams = zod.object({
 })
 
 export const DeleteGuestResponse = zod.void()
+
+
+/**
+ * @summary Change a guest RSVP as an administrator
+ */
+
+
+
+export const UpdateGuestRsvpParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const UpdateGuestRsvpBody = zod.object({
+  "status": zod.enum(['attending', 'not_attending'])
+})
+
+export const UpdateGuestRsvpResponse = zod.object({
+  "id": zod.int(),
+  "name": zod.string(),
+  "phone": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "invitationCode": zod.string(),
+  "token": zod.string(),
+  "invitationUrl": zod.string(),
+  "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
+  "checkedIn": zod.boolean(),
+  "checkedInAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Manually check in a guest using usher check-in logic
+ */
+
+
+
+export const AdminCheckInGuestParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const AdminCheckInGuestResponse = zod.object({
+  "result": zod.enum(['successful', 'already_checked_in', 'invalid']),
+  "guestName": zod.string().nullable(),
+  "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
+  "checkedInAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary Undo a guest check-in
+ */
+
+
+
+export const AdminUndoCheckInParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const AdminUndoCheckInResponse = zod.object({
+  "id": zod.int(),
+  "name": zod.string(),
+  "phone": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "invitationCode": zod.string(),
+  "token": zod.string(),
+  "invitationUrl": zod.string(),
+  "rsvpStatus": zod.enum(['pending', 'attending', 'not_attending']),
+  "checkedIn": zod.boolean(),
+  "checkedInAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
 
 
 /**

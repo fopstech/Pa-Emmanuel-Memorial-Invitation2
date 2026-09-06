@@ -12,6 +12,7 @@ export interface Event {
   title: string;
   wakeKeep: EventOccurrence;
   burial: EventOccurrence;
-  dressCode: string;
+  clothingDeadline: string;
+  clothingImage: string;
   photos: string[];
 }

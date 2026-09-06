@@ -7,6 +7,7 @@ import {
   ImportGuestsBody,
   ListGuestsQueryParams,
   PreviewGuestImportBody,
+  UpdateRsvpBody,
   UpdateGuestBody,
   UpdateGuestParams,
 } from "@workspace/api-zod";
@@ -22,6 +23,7 @@ import {
 import { parseGuestCsv } from "../lib/csv";
 import {
   cleanOptional,
+  checkInGuest,
   createUniqueInvitationCode,
   createUniqueToken,
   findDuplicateGuest,
@@ -141,6 +143,45 @@ router.patch("/admin/guests/:id", async (req, res) => {
   const [guest] = await db
     .update(guestsTable)
     .set(changes)
+    .where(eq(guestsTable.id, id))
+    .returning();
+  if (!guest) {
+    res.status(404).json({ error: "Guest not found." });
+    return;
+  }
+  res.json(serializeGuest(guest, req));
+});
+
+router.patch("/admin/guests/:id/rsvp", async (req, res) => {
+  const { id } = GetGuestParams.parse({ id: Number(req.params.id) });
+  const { status } = UpdateRsvpBody.parse(req.body);
+  const [guest] = await db
+    .update(guestsTable)
+    .set({ rsvpStatus: status, updatedAt: new Date() })
+    .where(eq(guestsTable.id, id))
+    .returning();
+  if (!guest) {
+    res.status(404).json({ error: "Guest not found." });
+    return;
+  }
+  res.json(serializeGuest(guest, req));
+});
+
+router.post("/admin/guests/:id/check-in", async (req, res) => {
+  const { id } = GetGuestParams.parse({ id: Number(req.params.id) });
+  const [guest] = await db.select().from(guestsTable).where(eq(guestsTable.id, id)).limit(1);
+  if (!guest) {
+    res.status(404).json({ error: "Guest not found." });
+    return;
+  }
+  res.json(await checkInGuest(guest.invitationCode));
+});
+
+router.post("/admin/guests/:id/undo-check-in", async (req, res) => {
+  const { id } = GetGuestParams.parse({ id: Number(req.params.id) });
+  const [guest] = await db
+    .update(guestsTable)
+    .set({ checkedIn: false, checkedInAt: null, updatedAt: new Date() })
     .where(eq(guestsTable.id, id))
     .returning();
   if (!guest) {

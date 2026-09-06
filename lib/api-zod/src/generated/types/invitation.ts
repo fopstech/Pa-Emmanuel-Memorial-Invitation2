@@ -10,8 +10,7 @@ import type { RsvpStatus } from './rsvpStatus';
 
 export interface Invitation {
   name: string;
-  token: string;
-  invitationUrl: string;
+  invitationCode: string;
   event: Event;
   rsvpStatus: RsvpStatus;
   checkedIn: boolean;

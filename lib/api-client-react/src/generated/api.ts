@@ -374,77 +374,6 @@ export const useUpdateRsvp = <TError = ErrorType<BadRequestResponse | NotFoundRe
       return useMutation(getUpdateRsvpMutationOptions(options));
     }
 
-export const getCheckInInvitationUrl = (token: string,) => {
-
-
-
-
-  return `/api/invitations/${token}/check-in`
-}
-
-/**
- * @summary Allow a guest to check themselves in
- */
-export const checkInInvitation = async (token: string, options?: Parameters<typeof customFetch>[1]): Promise<CheckInResult> => {
-
-  return customFetch<CheckInResult>(getCheckInInvitationUrl(token),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-
-
-
-export const getCheckInInvitationMutationOptions = <TError = ErrorType<NotFoundResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkInInvitation>>, TError,{token: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof checkInInvitation>>, TError,{token: string}, TContext> => {
-
-const mutationKey = ['checkInInvitation'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkInInvitation>>, {token: string}> = (props) => {
-          const {token} = props ?? {};
-
-          return  checkInInvitation(token,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CheckInInvitationMutationResult = NonNullable<Awaited<ReturnType<typeof checkInInvitation>>>
-
-    export type CheckInInvitationMutationError = ErrorType<NotFoundResponse>
-
-    /**
- * @summary Allow a guest to check themselves in
- */
-export const useCheckInInvitation = <TError = ErrorType<NotFoundResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkInInvitation>>, TError,{token: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof checkInInvitation>>,
-        TError,
-        {token: string},
-        TContext
-      > => {
-      return useMutation(getCheckInInvitationMutationOptions(options));
-    }
-
 export const getCheckInGuestUrl = () => {
 
 
@@ -1404,6 +1333,220 @@ export const useDeleteGuest = <TError = ErrorType<UnauthorizedResponse | NotFoun
         TContext
       > => {
       return useMutation(getDeleteGuestMutationOptions(options));
+    }
+
+export const getUpdateGuestRsvpUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/guests/${id}/rsvp`
+}
+
+/**
+ * @summary Change a guest RSVP as an administrator
+ */
+export const updateGuestRsvp = async (id: number,
+    rsvpInput: RsvpInput, options?: Parameters<typeof customFetch>[1]): Promise<Guest> => {
+
+  return customFetch<Guest>(getUpdateGuestRsvpUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(rsvpInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateGuestRsvpMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateGuestRsvp>>, TError,{id: number;data: BodyType<RsvpInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateGuestRsvp>>, TError,{id: number;data: BodyType<RsvpInput>}, TContext> => {
+
+const mutationKey = ['updateGuestRsvp'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateGuestRsvp>>, {id: number;data: BodyType<RsvpInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateGuestRsvp(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateGuestRsvpMutationResult = NonNullable<Awaited<ReturnType<typeof updateGuestRsvp>>>
+    export type UpdateGuestRsvpMutationBody = BodyType<RsvpInput>
+    export type UpdateGuestRsvpMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | NotFoundResponse>
+
+    /**
+ * @summary Change a guest RSVP as an administrator
+ */
+export const useUpdateGuestRsvp = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateGuestRsvp>>, TError,{id: number;data: BodyType<RsvpInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateGuestRsvp>>,
+        TError,
+        {id: number;data: BodyType<RsvpInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateGuestRsvpMutationOptions(options));
+    }
+
+export const getAdminCheckInGuestUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/guests/${id}/check-in`
+}
+
+/**
+ * @summary Manually check in a guest using usher check-in logic
+ */
+export const adminCheckInGuest = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<CheckInResult> => {
+
+  return customFetch<CheckInResult>(getAdminCheckInGuestUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminCheckInGuestMutationOptions = <TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCheckInGuest>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminCheckInGuest>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['adminCheckInGuest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminCheckInGuest>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  adminCheckInGuest(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminCheckInGuestMutationResult = NonNullable<Awaited<ReturnType<typeof adminCheckInGuest>>>
+
+    export type AdminCheckInGuestMutationError = ErrorType<UnauthorizedResponse | NotFoundResponse>
+
+    /**
+ * @summary Manually check in a guest using usher check-in logic
+ */
+export const useAdminCheckInGuest = <TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCheckInGuest>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminCheckInGuest>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getAdminCheckInGuestMutationOptions(options));
+    }
+
+export const getAdminUndoCheckInUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/guests/${id}/undo-check-in`
+}
+
+/**
+ * @summary Undo a guest check-in
+ */
+export const adminUndoCheckIn = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<Guest> => {
+
+  return customFetch<Guest>(getAdminUndoCheckInUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminUndoCheckInMutationOptions = <TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUndoCheckIn>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminUndoCheckIn>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['adminUndoCheckIn'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminUndoCheckIn>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  adminUndoCheckIn(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminUndoCheckInMutationResult = NonNullable<Awaited<ReturnType<typeof adminUndoCheckIn>>>
+
+    export type AdminUndoCheckInMutationError = ErrorType<UnauthorizedResponse | NotFoundResponse>
+
+    /**
+ * @summary Undo a guest check-in
+ */
+export const useAdminUndoCheckIn = <TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUndoCheckIn>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminUndoCheckIn>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getAdminUndoCheckInMutationOptions(options));
     }
 
 export const getPreviewGuestImportUrl = () => {

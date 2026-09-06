@@ -8,6 +8,7 @@ export const memorialEvent = {
     isoStart: "2026-10-15T16:00:00+01:00",
     isoEnd: "2026-10-15T20:00:00+01:00",
     venue: "CGCC Citadel Global Community Church",
+    dressCode: "White with shades of Blue",
     directionsUrl:
       "https://www.google.com/maps/search/?api=1&query=CGCC+Citadel+Global+Community+Church",
   },
@@ -17,11 +18,13 @@ export const memorialEvent = {
     time: "2:00 PM",
     isoStart: "2026-10-16T14:00:00+01:00",
     isoEnd: "2026-10-16T18:00:00+01:00",
-    venue: "Ronnie D Event / Ronnie D'Events",
+    venue: "Ronnie D'Events",
+    dressCode: "Purple, Gold or Magenta",
     directionsUrl:
       "https://www.google.com/maps/search/?api=1&query=Ronnie+D+Events",
   },
-  dressCode: "Purple",
+  clothingDeadline: "September 30, 2026",
+  clothingImage: "/memorial-gallery.jpg",
   photos: ["/memorial-main.jpg", "/memorial-gallery.jpg"],
 } as const;
 

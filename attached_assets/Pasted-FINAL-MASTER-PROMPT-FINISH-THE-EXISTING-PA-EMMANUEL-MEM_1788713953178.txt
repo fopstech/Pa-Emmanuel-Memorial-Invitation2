@@ -1,0 +1,813 @@
+FINAL MASTER PROMPT — FINISH THE EXISTING PA EMMANUEL MEMORIAL INVITATION
+
+CONTINUE THE EXISTING PROJECT. DO NOT REBUILD FROM SCRATCH.
+
+First inspect the CURRENT codebase, database, routes, components, assets and existing implementation.
+
+Preserve everything that already works.
+
+Do NOT waste time rebuilding completed features.
+Do NOT install unnecessary packages.
+Do NOT create duplicate systems.
+Do NOT replace the existing persistent database with localStorage or mock data.
+Do NOT delete existing guest data.
+Only implement, fix, improve and finish what is missing.
+
+Do not stop at explanations. ACTUALLY IMPLEMENT the remaining work.
+
+==================================================
+1. PREMIUM MEMORIAL UI / UX
+==================================================
+
+The finished website must look like a professionally designed PREMIUM DIGITAL MEMORIAL INVITATION.
+
+It must NOT look like:
+- A generic SaaS dashboard
+- A generic AI-generated website
+- A developer template
+- A basic HTML form
+- An unfinished Replit project
+
+OVERALL DESIGN:
+- Elegant
+- Respectful
+- Warm
+- Sophisticated
+- Modern
+- Mobile-first
+- Purple as the main visual identity
+- Subtle gold accents
+- Excellent typography
+- Beautiful spacing
+- Clear visual hierarchy
+- Smooth scrolling
+- Tasteful animations
+- No excessive animation
+
+Use Pa Emmanuel Ayodele Abatan's ACTUAL uploaded photograph.
+
+His photograph must be visually prominent.
+
+Never:
+- Distort the photograph
+- Stretch the photograph
+- Crop his face awkwardly
+- Replace his photograph with random stock images
+- Use a generic Replit image
+
+PUBLIC HERO:
+
+Create a beautiful hero section containing:
+
+"YOU ARE INVITED"
+
+"The Burial Ceremony of
+Pa Emmanuel Ayodele Abatan"
+
+Display Pa Emmanuel's photograph beautifully.
+
+Do not overcrowd the hero.
+
+PUBLIC SECTIONS:
+- Hero
+- Memorial/invitation message
+- Event details
+- Wake Keep dress code
+- Burial dress code
+- Clothing section
+- RSVP
+- Personalized invitation
+- QR/invitation code
+- Memorial gallery
+
+Do not invent biographical information about Pa Emmanuel.
+
+==================================================
+2. EVENT INFORMATION — MUST BE EXACT
+==================================================
+
+WAKE KEEP
+
+October 15, 2026
+4:00 PM
+
+Venue:
+CGCC Citadel Global Community Church
+
+Dress Code:
+WHITE WITH SHADES OF BLUE
+
+
+BURIAL
+
+October 16, 2026
+2:00 PM
+
+Venue:
+Ronnie D'Events
+
+Dress Code:
+PURPLE, GOLD OR MAGENTA
+
+
+IMPORTANT:
+
+Do NOT combine the two dress codes.
+
+Do NOT say simply:
+"Dress Code: Purple"
+
+Each event must have its own clearly labelled event card and dress-code section.
+
+Use tasteful visual colour accents to communicate the two different dress-code themes while keeping the overall memorial website elegant and cohesive.
+
+==================================================
+3. PERSONALIZED INVITATION
+==================================================
+
+Create:
+
+/invite/:token
+
+The guest should see:
+
+"YOU ARE INVITED"
+
+"Welcome, [Guest Name]"
+
+Then the personalized memorial invitation.
+
+Guests must NOT need:
+
+- Account creation
+- Password
+- Email login
+- Google login
+- OTP
+
+The guest's identity comes from their unique invitation token.
+
+Every guest must have:
+
+ONE guest identity
+ONE invitation token
+ONE human-friendly invitation code
+ONE QR code
+
+The QR code and invitation code MUST represent the exact same guest.
+
+Example human-friendly invitation code:
+
+PMA-7K4X92
+
+The internal token must NEVER be displayed to guests.
+
+==================================================
+4. RSVP
+==================================================
+
+Create a beautiful memorial RSVP section.
+
+Question:
+
+"WILL YOU BE JOINING US?"
+
+Buttons:
+
+"YES, I'LL BE ATTENDING"
+
+"NO, I WON'T BE ABLE TO ATTEND"
+
+After the guest responds, display:
+
+"Your attendance has been acknowledged."
+
+"Your response has been recorded and cannot be changed."
+
+The guest must NOT be able to change their RSVP afterward.
+
+Only the admin can change it.
+
+Save RSVP permanently in the database.
+
+If YES:
+
+Display a beautiful digital invitation card containing:
+
+Guest Name
+Invitation Code
+Matching QR Code
+
+And:
+
+"Please present your invitation at the entrance."
+
+The guest must NOT be able to check themselves in.
+
+==================================================
+5. INVITATION CODE + QR
+==================================================
+
+Every guest receives ONE unique invitation code.
+
+Every guest receives ONE matching QR code.
+
+The QR must encode the guest's invitation identity/token securely.
+
+The QR and manually entered invitation code MUST resolve to the SAME guest record.
+
+Admin must be able to:
+
+- View QR
+- Download QR
+- Print QR
+- Copy invitation code
+- Copy invitation link
+- Share invitation
+
+Never create separate identities for QR and invitation code.
+
+==================================================
+6. WHATSAPP SHARING
+==================================================
+
+THIS IS VERY IMPORTANT.
+
+The invitation link must have a professional sharing experience.
+
+The URL may technically contain a secure token, but the visible WhatsApp message and website preview must look like a REAL MEMORIAL INVITATION, not a random technical link.
+
+Configure proper Open Graph and Twitter metadata.
+
+Use:
+
+og:title:
+"You Are Invited to the Burial of Pa Emmanuel"
+
+og:description:
+"Join us as we honour and celebrate the life of Pa Emmanuel Ayodele Abatan."
+
+og:image:
+Pa Emmanuel's uploaded photograph.
+
+Twitter/social preview must also use Pa Emmanuel's photograph.
+
+Browser title:
+
+"Pa Emmanuel Memorial Invitation"
+
+Favicon:
+Pa Emmanuel's photograph.
+
+Do NOT use:
+- Replit default preview image
+- Generic website image
+- Random stock image
+
+When the personalized invitation link is pasted into WhatsApp, Facebook or another supported platform, provide the correct preview metadata so supported platforms can generate a preview containing:
+
+Pa Emmanuel's photo
+
+"You Are Invited to the Burial of Pa Emmanuel"
+
+"Join us as we honour and celebrate the life of Pa Emmanuel Ayodele Abatan."
+
+IMPORTANT:
+
+WhatsApp controls its own preview rendering and caching, so do not claim that the website can force WhatsApp to display a preview.
+
+However, make ALL website metadata correctly configured so WhatsApp has the correct information to generate the preview.
+
+==================================================
+7. DIRECT WHATSAPP SHARING
+==================================================
+
+Add a beautiful:
+
+"SHARE ON WHATSAPP"
+
+button.
+
+When clicked, it must open WhatsApp's share/compose flow with a pre-written message.
+
+Message should be similar to:
+
+"You are invited to the burial ceremony of Pa Emmanuel Ayodele Abatan.
+
+Wake Keep:
+October 15, 2026 at 4:00 PM
+CGCC Citadel Global Community Church
+Dress Code: White with shades of Blue
+
+Burial:
+October 16, 2026 at 2:00 PM
+Ronnie D'Events
+Dress Code: Purple, Gold or Magenta
+
+View your personal invitation:
+[PERSONALIZED INVITATION LINK]"
+
+The personalized invitation link MUST belong to the correct guest.
+
+Do NOT hard-code one guest's link for everyone.
+
+The admin must be able to use the WhatsApp sharing button for ANY guest.
+
+Also provide:
+
+"Copy Invitation Link"
+
+and, where supported:
+
+"Share Invitation"
+
+using the Web Share API.
+
+All sharing buttons must actually work.
+
+==================================================
+8. ADMIN DASHBOARD
+==================================================
+
+Route:
+
+/admin
+
+Protected by secure server-side authentication/session.
+
+Admin access code:
+
+2011
+
+NEVER expose this code in frontend JavaScript.
+
+Dashboard statistics:
+
+Total Guests
+Attending
+Not Attending
+Pending
+Checked In
+Not Checked In
+
+Guest management:
+
+- Add guest
+- Edit guest
+- Delete guest
+- Search guest
+- Filter guests
+- View guest
+- Copy invitation link
+- Copy invitation code
+- View QR
+- Download QR
+- Print QR
+- Share on WhatsApp
+- Change RSVP
+- Manually check in
+- Undo check-in
+- View check-in timestamp
+
+Keep the admin UI clean, compact and easy to use.
+
+Do NOT turn it into a huge unnecessary SaaS dashboard.
+
+==================================================
+9. GUEST IMPORT — CSV + SPREADSHEET
+==================================================
+
+Admin must be able to:
+
+1. Upload CSV.
+2. Paste spreadsheet data directly.
+
+Support data such as:
+
+Name    Phone    Email
+John Doe    08012345678    john@email.com
+Jane Doe    08098765432    jane@email.com
+
+Automatically detect columns.
+
+Show an import preview BEFORE saving.
+
+Show invalid rows clearly.
+
+Name is required.
+
+Phone and email are optional.
+
+Prevent duplicate imports.
+
+Every imported guest must automatically receive:
+
+- Unique database identity
+- Unique invitation token
+- Unique invitation code
+- Matching QR code
+- Personalized invitation URL
+
+==================================================
+10. USHER CHECK-IN
+==================================================
+
+Route:
+
+/check-in
+
+Usher access code:
+
+30
+
+Keep the code server-side.
+
+Do NOT expose it in frontend JavaScript.
+
+Usher must have TWO methods:
+
+A. Scan QR using the phone camera directly through the website.
+
+B. Enter invitation code manually.
+
+No separate scanner app should be required.
+
+Both methods MUST use the SAME backend check-in logic.
+
+If valid and not checked in:
+
+Show:
+
+"CHECK-IN SUCCESSFUL"
+
+Display:
+
+Guest Name
+Invitation Code
+Check-in Time
+
+Save:
+
+checkedIn = true
+checkedInAt = timestamp
+
+If already checked in:
+
+Show:
+
+"ALREADY CHECKED IN"
+
+Display the original check-in time.
+
+Prevent duplicate check-ins.
+
+Guests must NEVER be able to check themselves in.
+
+==================================================
+11. CLOTHING
+==================================================
+
+The clothing section must display the uploaded clothing image beautifully.
+
+The event dress codes are:
+
+WAKE KEEP:
+White with shades of Blue
+
+BURIAL:
+Purple, Gold or Magenta
+
+CLOTHING ORDER/PURCHASE DEADLINE:
+
+September 30, 2026
+
+Before the deadline:
+
+Allow the appropriate clothing selection/order functionality that already exists.
+
+After the deadline display:
+
+"CLOTHING ORDERS ARE NOW CLOSED"
+
+Do NOT allow new clothing selections after the deadline.
+
+Preserve existing selections.
+
+==================================================
+12. DATABASE
+==================================================
+
+Use the EXISTING persistent database.
+
+Do NOT replace it with:
+
+- localStorage
+- mock data
+- hard-coded guest records
+
+Guest records should contain appropriate fields such as:
+
+id
+name
+phone
+email
+invitationCode
+token
+rsvpStatus
+checkedIn
+checkedInAt
+createdAt
+updatedAt
+
+Invitation code and token must be unique.
+
+Data must survive:
+
+- Page refresh
+- Browser restart
+- Server restart
+- Redeployment
+
+Preserve existing data and schema wherever possible.
+
+==================================================
+13. SECURITY
+==================================================
+
+Admin code 2011 and usher code 30 MUST remain server-side.
+
+Use secure server-side sessions.
+
+Do NOT expose:
+
+- Database credentials
+- API keys
+- Secrets
+- Admin credentials
+- Usher credentials
+
+Do NOT commit secrets to GitHub.
+
+Guests must NOT be able to access protected admin or usher functionality.
+
+Do not trust frontend-only authentication.
+
+Validate protected actions on the server.
+
+==================================================
+14. ROUTES
+==================================================
+
+/
+
+Public memorial invitation.
+
+/invite/:token
+
+Personalized guest invitation.
+
+/admin
+
+Protected admin dashboard.
+
+/check-in
+
+Protected usher check-in.
+
+Every route must work when opened directly.
+
+==================================================
+15. RESPONSIVE DESIGN
+==================================================
+
+Test and fix the UI for:
+
+320px
+375px
+390px
+430px
+Tablet
+Desktop
+
+Requirements:
+
+- No horizontal scrolling.
+- No text overflow.
+- No broken images.
+- No buttons cut off.
+- Touch targets must be easy to tap.
+- Navigation must work on mobile.
+- QR must display properly on phones.
+- Camera scanner must fit properly on phone screens.
+- Admin guest lists must remain usable on mobile.
+- Invitation cards must look good when viewed on a phone.
+
+==================================================
+16. BUTTONS AND INTERACTIONS
+==================================================
+
+EVERY SINGLE INTERACTIVE ELEMENT MUST ACTUALLY WORK.
+
+This includes:
+
+- Buttons
+- Forms
+- RSVP
+- Invitation code
+- QR code
+- QR scanner
+- Manual check-in
+- Admin login
+- Usher login
+- Guest creation
+- Guest editing
+- Guest deletion
+- Guest search
+- Guest filters
+- CSV upload
+- Spreadsheet paste
+- Import confirmation
+- Duplicate detection
+- Copy invitation link
+- Copy invitation code
+- WhatsApp sharing
+- General share
+- QR download
+- QR print
+- RSVP locking
+- Admin RSVP changes
+- Check-in
+- Undo check-in
+- Clothing selection
+- Clothing deadline
+- Navigation
+- Gallery
+
+NO fake buttons.
+
+NO placeholder buttons.
+
+NO dead links.
+
+NO TODO features.
+
+NO mock functionality.
+
+==================================================
+17. SOCIAL PREVIEW / SHARING QUALITY
+==================================================
+
+Make the public invitation extremely shareable.
+
+Configure:
+
+title
+description
+og:title
+og:description
+og:image
+og:url
+twitter:title
+twitter:description
+twitter:image
+twitter:card
+favicon
+
+Use Pa Emmanuel's actual uploaded photograph.
+
+Do NOT use Replit's default image.
+
+For personalized invitation URLs, generate appropriate metadata where technically possible while keeping the guest token secure.
+
+==================================================
+18. FINAL COMPLETE TEST
+==================================================
+
+Before declaring the project finished:
+
+Run:
+
+- Typecheck
+- Production build
+- Tests where available
+
+Fix ALL errors.
+
+Then test the COMPLETE FLOW.
+
+ADMIN:
+
+→ Login with 2011
+→ Add guest
+→ Generate invitation code
+→ Generate matching QR
+→ Copy invitation link
+→ Share through WhatsApp
+→ Edit guest
+→ Search guest
+→ Filter guest
+→ View QR
+→ Download QR
+→ Print QR
+→ Delete guest
+
+GUEST:
+
+→ Open personalized invitation
+→ Guest name appears
+→ Pa Emmanuel photo appears
+→ Event details are correct
+→ Both dress codes are correct
+→ RSVP YES
+→ RSVP is saved
+→ RSVP becomes locked
+→ Invitation code appears
+→ Matching QR appears
+
+USHER:
+
+→ Login with 30
+→ Scan QR
+→ Correct guest found
+→ Check-in successful
+→ Timestamp saved
+→ Scan same QR again
+→ Already checked in message appears
+
+MANUAL CHECK-IN:
+
+→ Enter invitation code
+→ Same guest is found
+→ Check-in logic works
+
+IMPORT:
+
+→ Paste spreadsheet
+→ Preview
+→ Validate
+→ Import
+→ Generate unique codes and QR
+→ Prevent duplicates
+
+CLOTHING:
+
+→ Before September 30, 2026: selections work
+→ After September 30, 2026: new selections are blocked
+→ Existing selections remain
+
+SHARING:
+
+→ Copy invitation link works
+→ WhatsApp button opens WhatsApp sharing/compose
+→ Correct personalized invitation link is included
+→ Social preview metadata points to Pa Emmanuel's photo
+→ Favicon uses Pa Emmanuel's photo
+
+UI:
+
+→ Check mobile layouts
+→ Check desktop layout
+→ Check buttons
+→ Check forms
+→ Check loading states
+→ Check success states
+→ Check error states
+→ Check empty states
+→ Check images
+→ Check QR display
+→ Check camera scanner
+→ Check navigation
+→ Check accessibility and readable text
+
+==================================================
+19. FINAL RULE
+==================================================
+
+DO NOT STOP UNTIL THE EXISTING PROJECT IS FULLY FUNCTIONAL, POLISHED, RESPONSIVE AND PRODUCTION-READY.
+
+Do not rebuild working parts.
+
+Do not waste quota explaining what you could implement.
+
+Inspect first.
+
+Identify exactly what is remaining.
+
+Implement it.
+
+Test it.
+
+Fix it.
+
+Then test the complete application again.
+
+EVERY BUTTON, FORM, LINK, QR CODE, INVITATION CODE, RSVP ACTION, CHECK-IN ACTION, ADMIN ACTION, CSV IMPORT, CAMERA SCANNER, WHATSAPP SHARE, GENERAL SHARE, DOWNLOAD, PRINT FUNCTION AND DATABASE OPERATION MUST ACTUALLY WORK.
+
+NO PLACEHOLDERS.
+NO FAKE FEATURES.
+NO DEAD BUTTONS.
+NO DEAD LINKS.
+NO TODOs.
+NO MOCK GUEST DATA.
+
+FINISH THE EXISTING PROJECT.

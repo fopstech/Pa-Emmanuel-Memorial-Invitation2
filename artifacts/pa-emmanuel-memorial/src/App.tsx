@@ -4,8 +4,9 @@ import QRCode from 'qrcode';
 import { Html5Qrcode } from 'html5-qrcode';
 import {
   useAdminLogin,
+  useAdminCheckInGuest,
   useAdminLogout,
-  useCheckInInvitation,
+  useAdminUndoCheckIn,
   useCheckInGuest,
   useCreateGuest,
   useDeleteGuest,
@@ -19,6 +20,7 @@ import {
   useListGuests,
   usePreviewGuestImport,
   useUpdateGuest,
+  useUpdateGuestRsvp,
   useUpdateRsvp,
   useUsherLogin,
   useUsherLogout,
@@ -51,6 +53,7 @@ import {
   Plus,
   Search,
   Sparkles,
+  Share2,
   Trash2,
   Users,
   X,
@@ -85,6 +88,46 @@ const errorMessage = (error: unknown) => {
 const statusLabel = (status: RsvpStatus) => status === 'attending' ? 'Attending' : status === 'not_attending' ? 'Unable to attend' : 'Awaiting reply';
 const initials = (name: string) => name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
 const memorialPortrait = '/memorial-main.jpg';
+
+const copyText = async (value: string) => {
+  if (navigator.clipboard) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+  const input = document.createElement('textarea');
+  input.value = value;
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand('copy');
+  input.remove();
+};
+
+const invitationShareMessage = (guestName: string, link: string) => `You are invited to the burial ceremony of Pa Emmanuel Ayodele Abatan.
+
+Wake Keep:
+October 15, 2026 at 4:00 PM
+CGCC Citadel Global Community Church
+Dress Code: White with shades of Blue
+
+Burial:
+October 16, 2026 at 2:00 PM
+Ronnie D'Events
+Dress Code: Purple, Gold or Magenta
+
+${guestName ? `Dear ${guestName},\n\n` : ''}View your personal invitation:
+${link}`;
+
+const shareOnWhatsApp = (guestName: string, link: string) => {
+  window.open(`https://wa.me/?text=${encodeURIComponent(invitationShareMessage(guestName, link))}`, '_blank', 'noopener,noreferrer');
+};
+
+const shareInvitation = async (guestName: string, link: string) => {
+  if (navigator.share) {
+    await navigator.share({ title: 'You Are Invited to the Burial of Pa Emmanuel', text: invitationShareMessage(guestName, link), url: link });
+  } else {
+    await copyText(link);
+  }
+};
 
 function downloadCalendar(event: Event, kind: 'wakeKeep' | 'burial') {
   const occurrence = event[kind];
@@ -156,13 +199,8 @@ function PublicHeader() {
       <nav className="hidden items-center gap-7 text-[11px] font-semibold uppercase tracking-[.18em] text-[hsl(var(--sidebar-foreground))]/70 sm:flex">
         <a href="#service" data-testid="link-service" className="transition-colors hover:text-[hsl(var(--accent))]">The service</a>
         <a href="#details" data-testid="link-details" className="transition-colors hover:text-[hsl(var(--accent))]">Details</a>
-        <Link href="/check-in" data-testid="link-check-in" className="transition-colors hover:text-[hsl(var(--accent))]">Check in</Link>
-        <Link href="/admin" data-testid="link-header-admin" className="transition-colors hover:text-[hsl(var(--accent))]">Admin dashboard</Link>
       </nav>
-      <div className="flex items-center gap-2 sm:hidden">
-        <Link href="/admin" data-testid="link-header-admin-mobile" className="rounded-full border border-[hsl(var(--sidebar-foreground))]/25 px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-[hsl(var(--sidebar-foreground))] transition-colors hover:border-[hsl(var(--accent))] hover:text-[hsl(var(--accent))]">Admin</Link>
-        <Link href="/check-in" data-testid="link-header-check-in" className="rounded-full border border-[hsl(var(--sidebar-foreground))]/25 px-3 py-2 text-[10px] font-semibold uppercase tracking-[.12em] text-[hsl(var(--sidebar-foreground))] transition-colors hover:border-[hsl(var(--accent))] hover:text-[hsl(var(--accent))]">Check in</Link>
-      </div>
+      <div className="sm:hidden" aria-hidden="true" />
     </header>
   );
 }
@@ -193,9 +231,38 @@ function EventDetails({ event }: { event: Event }) {
              <div className="grid gap-8 sm:grid-cols-2">
                {[event.wakeKeep, event.burial].map((item) => <div className="flex gap-4" data-testid={`event-venue-${item.label.toLowerCase().replaceAll(' ', '-')}`} key={item.label}><MapPin className="mt-1 size-5 shrink-0 text-accent" strokeWidth={1.5} /><div><p className="mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">{item.label} venue</p><p className="mt-2 text-sm leading-6">{item.venue}</p><a className="mt-2 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.1em] text-primary underline decoration-accent underline-offset-4" href={item.directionsUrl} target="_blank" rel="noreferrer" data-testid={`link-directions-${item.label.toLowerCase().replaceAll(' ', '-')}`}>Open directions <ArrowRight className="size-3" /></a></div></div>)}
              </div>
-             <div className="flex gap-4" data-testid="event-dress-code"><Sparkles className="mt-1 size-5 shrink-0 text-accent" strokeWidth={1.5} /><div><p className="mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">Dress code</p><p className="mt-2 text-sm leading-6">{event.dressCode}</p></div></div>
+              <div className="grid gap-4 sm:grid-cols-2" data-testid="section-dress-codes">
+                {[event.wakeKeep, event.burial].map((item) => <div className="flex gap-4 border border-border p-5" key={item.label} data-testid={`dress-code-${item.label.toLowerCase().replaceAll(' ', '-')}`}>
+                  <Sparkles className="mt-1 size-5 shrink-0 text-accent" strokeWidth={1.5} />
+                  <div><p className="mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">{item.label} dress code</p><p className="mt-2 text-sm font-semibold leading-6">{item.dressCode}</p></div>
+                </div>)}
+              </div>
              <div className="grid gap-4 sm:grid-cols-2" data-testid="section-memorial-photos">{event.photos.map((photo, index) => <img key={photo} src={photo} alt={`${event.name} memorial photograph ${index + 1}`} className="max-h-[34rem] w-full bg-primary object-contain" />)}</div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ClothingSection({ event }: { event: Event }) {
+  const deadline = new Date('2026-10-01T00:00:00+01:00');
+  const isClosed = new Date() >= deadline;
+  return (
+    <section className="border-t border-border bg-secondary/35 px-5 py-16 sm:px-8 lg:px-12" data-testid="section-clothing">
+      <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
+        <div>
+          <p className="mono text-[10px] uppercase tracking-[.22em] text-muted-foreground">Clothing guidance</p>
+          <h2 className="serif mt-4 text-5xl leading-[.95] text-primary">Wear the colours<br /><em>of remembrance.</em></h2>
+          <p className="mt-6 max-w-md text-sm leading-7 text-muted-foreground">For the wake keep, please wear white with shades of blue. For the burial, please wear purple, gold or magenta.</p>
+          <div className="mt-7 border-l border-accent pl-5">
+            <p className="mono text-[10px] uppercase tracking-[.18em] text-muted-foreground">Clothing order deadline</p>
+            <p className="serif mt-2 text-2xl text-primary">{isClosed ? 'Clothing orders are now closed' : event.clothingDeadline}</p>
+            {!isClosed && <p className="mt-2 text-xs leading-5 text-muted-foreground">Please make any clothing arrangements before this date.</p>}
+          </div>
+        </div>
+        <div className="overflow-hidden border border-border bg-background p-3">
+          <img src={event.clothingImage} alt="Pa Emmanuel in traditional clothing" className="max-h-[34rem] w-full object-contain object-top" data-testid="img-clothing-guidance" />
         </div>
       </div>
     </section>
@@ -219,8 +286,8 @@ function HomePage() {
         <div className="absolute bottom-0 right-[12%] hidden h-[70%] w-px bg-accent/20 lg:block" />
         <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-14 lg:grid-cols-[1.1fr_.9fr] lg:items-end">
           <div className="max-w-3xl">
-             <p className="mono reveal-up text-[11px] uppercase tracking-[.3em] text-accent">In loving memory</p>
-            <h1 className="serif reveal-up reveal-delay-1 mt-6 text-[clamp(4rem,12vw,9.5rem)] leading-[.78] tracking-[-.04em]">{event.name}</h1>
+             <p className="mono reveal-up text-[11px] uppercase tracking-[.3em] text-accent">You are invited</p>
+             <h1 className="serif reveal-up reveal-delay-1 mt-6 text-[clamp(3.5rem,10vw,8.5rem)] leading-[.82] tracking-[-.04em]">The Burial Ceremony of <em className="mt-3 block not-italic">{event.name}</em></h1>
             <p className="reveal-up reveal-delay-2 mt-9 max-w-lg text-base leading-7 text-primary-foreground/70">{event.title}. A quiet invitation to gather, to pray, and to share the stories that keep a beloved life close.</p>
             <a href="#details" data-testid="link-scroll-details" className="reveal-up reveal-delay-3 mt-9 inline-flex items-center gap-3 border-b border-accent pb-2 text-xs font-semibold uppercase tracking-[.18em] text-accent">See the details <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></a>
           </div>
@@ -238,10 +305,11 @@ function HomePage() {
         </div>
       </section>
       <EventDetails event={event} />
-      <section id="service" className="border-t border-border bg-secondary/50 px-5 py-16 sm:px-8 lg:px-12">
+       <ClothingSection event={event} />
+       <section id="service" className="border-t border-border bg-secondary/50 px-5 py-16 sm:px-8 lg:px-12">
         <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
-          <div><p className="mono text-[10px] uppercase tracking-[.22em] text-muted-foreground">A note for guests</p><p className="serif mt-3 text-3xl text-primary">Your presence is the greatest gift.</p></div>
-          <Link href="/check-in" data-testid="link-check-in-cta" className="inline-flex items-center justify-center gap-3 bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-[.16em] text-primary-foreground transition-transform hover:-translate-y-1">Check in at the service <ArrowRight className="size-4 text-accent" /></Link>
+           <div><p className="mono text-[10px] uppercase tracking-[.22em] text-muted-foreground">A note for guests</p><p className="serif mt-3 text-3xl text-primary">Your presence is the greatest gift.</p></div>
+           <p className="max-w-sm text-sm leading-6 text-muted-foreground">Please keep your invitation code close and present it to an usher when you arrive.</p>
         </div>
       </section>
       <footer className="flex flex-col gap-4 bg-primary px-5 py-8 text-primary-foreground/60 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12"><Wordmark light /><p className="mono text-[10px] uppercase tracking-[.15em]">A family invitation · Pa Emmanuel Ayodele Abatan</p></footer>
@@ -254,23 +322,25 @@ function InvitePage() {
   const queryClient = useQueryClient();
   const invitationQuery = useGetInvitation(token, { query: { enabled: Boolean(token), queryKey: getGetInvitationQueryKey(token) } });
   const rsvp = useUpdateRsvp();
-  const selfCheckIn = useCheckInInvitation({
-    mutation: {
-      onSuccess: (result) => {
-        if (result.result === 'successful' || result.result === 'already_checked_in') {
-          queryClient.setQueryData(getGetInvitationQueryKey(token), {
-            ...invite,
-            checkedIn: true,
-            checkedInAt: result.checkedInAt,
-          });
-        }
-      },
-    },
-  });
+  const [qrDataUrl, setQrDataUrl] = useState('');
+  const loadedInvite = invitationQuery.data;
+  useEffect(() => {
+    if (!loadedInvite || loadedInvite.rsvpStatus !== 'attending') {
+      setQrDataUrl('');
+      return;
+    }
+    void QRCode.toDataURL(loadedInvite.invitationCode, {
+      width: 560,
+      margin: 2,
+      errorCorrectionLevel: 'M',
+      color: { dark: '#172b25', light: '#f7f3eb' },
+    }).then(setQrDataUrl);
+  }, [loadedInvite?.invitationCode, loadedInvite?.rsvpStatus]);
   if (invitationQuery.isLoading) return <LoadingPanel label="Preparing your invitation…" />;
   if (invitationQuery.isError || !invitationQuery.data) return <ErrorPanel error={invitationQuery.error} onRetry={() => invitationQuery.refetch()} />;
-  const invite = invitationQuery.data;
+  const invite = loadedInvite!;
   const event = invite.event;
+  const invitationLink = `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}/invite/${token}`;
   const saveRsvp = (status: 'attending' | 'not_attending') => rsvp.mutate({ token, data: { status } }, {
     onSuccess: (next) => {
       queryClient.setQueryData(getGetInvitationQueryKey(token), next);
@@ -279,7 +349,7 @@ function InvitePage() {
   });
   return (
     <div className="paper-grain min-h-[100dvh] bg-background">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-12"><Wordmark /><div className="flex items-center gap-4"><Link href="/admin" data-testid="link-invite-admin" className="text-[10px] font-semibold uppercase tracking-[.15em] text-muted-foreground transition-colors hover:text-primary">Admin dashboard</Link><Link href="/" data-testid="link-invite-home" className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.17em] text-muted-foreground"><ChevronLeft className="size-4" /> Home</Link></div></div>
+       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-12"><Wordmark /><Link href="/" data-testid="link-invite-home" className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.17em] text-muted-foreground"><ChevronLeft className="size-4" /> Home</Link></div>
       <main className="mx-auto max-w-5xl px-5 pb-20 pt-12 sm:px-8 lg:px-12">
         <div className="relative overflow-hidden bg-primary px-7 py-14 text-primary-foreground sm:px-14 sm:py-20">
           <div className="absolute -right-20 -top-28 size-72 rounded-full border border-accent/20" />
@@ -299,20 +369,19 @@ function InvitePage() {
             <p className="mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">Your response</p>
             <h2 className="serif mt-3 text-4xl text-primary">Will you join us?</h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">A response helps the family and our ushers prepare a place for you.</p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <button type="button" disabled={rsvp.isPending} onClick={() => saveRsvp('attending')} data-testid="button-rsvp-attending" className={`inline-flex items-center justify-center gap-2 border px-5 py-3 text-xs font-semibold uppercase tracking-[.13em] transition-colors ${invite.rsvpStatus === 'attending' ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary'}`}>{invite.rsvpStatus === 'attending' && <Check className="size-4" />} I will be there</button>
-              <button type="button" disabled={rsvp.isPending} onClick={() => saveRsvp('not_attending')} data-testid="button-rsvp-decline" className={`border px-5 py-3 text-xs font-semibold uppercase tracking-[.13em] transition-colors ${invite.rsvpStatus === 'not_attending' ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary'}`}>I cannot attend</button>
+             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+               <button type="button" disabled={rsvp.isPending || invite.rsvpStatus !== 'pending'} onClick={() => saveRsvp('attending')} data-testid="button-rsvp-attending" className={`inline-flex items-center justify-center gap-2 border px-5 py-3 text-xs font-semibold uppercase tracking-[.13em] transition-colors ${invite.rsvpStatus === 'attending' ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary disabled:cursor-not-allowed disabled:opacity-50'}`}>{invite.rsvpStatus === 'attending' && <Check className="size-4" />} Yes, I'll be attending</button>
+               <button type="button" disabled={rsvp.isPending || invite.rsvpStatus !== 'pending'} onClick={() => saveRsvp('not_attending')} data-testid="button-rsvp-decline" className={`border px-5 py-3 text-xs font-semibold uppercase tracking-[.13em] transition-colors ${invite.rsvpStatus === 'not_attending' ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:border-primary disabled:cursor-not-allowed disabled:opacity-50'}`}>No, I won't be able to attend</button>
             </div>
-             <div className="mt-7 border-t border-border pt-6"><p className="text-xs leading-5 text-muted-foreground">Arriving at the service? You can check yourself in from this private invitation.</p><button type="button" onClick={() => selfCheckIn.mutate({ token })} disabled={selfCheckIn.isPending || invite.checkedIn} data-testid="button-self-check-in" className="mt-3 inline-flex items-center gap-2 bg-primary px-5 py-3 text-xs font-semibold uppercase tracking-[.13em] text-primary-foreground disabled:opacity-60">{selfCheckIn.isPending ? <LoaderCircle className="size-4 animate-spin" /> : <CheckCircle2 className="size-4 text-accent" />}{invite.checkedIn ? 'Already checked in' : 'Check in'}</button>{selfCheckIn.isError && <p className="mt-3 text-xs text-destructive">{errorMessage(selfCheckIn.error)}</p>}{(selfCheckIn.data || invite.checkedIn) && <p className="mt-3 text-xs text-primary" data-testid="status-self-check-in">{selfCheckIn.data?.result === 'already_checked_in' || invite.checkedIn ? 'Already Checked In' : 'Check-in successful'}{(selfCheckIn.data?.checkedInAt || invite.checkedInAt) && ` · ${new Date(selfCheckIn.data?.checkedInAt || invite.checkedInAt || '').toLocaleString('en-GB')}`}</p>}</div>
             {rsvp.isError && <p className="mt-4 text-xs text-destructive" data-testid="status-rsvp-error">{errorMessage(rsvp.error)}</p>}
-            {invite.rsvpStatus !== 'pending' && <p className="mt-5 text-xs text-muted-foreground" data-testid="status-rsvp">Your response: <strong className="text-foreground">{statusLabel(invite.rsvpStatus)}</strong></p>}
+             {invite.rsvpStatus !== 'pending' && <div className="mt-7 border-t border-border pt-6" data-testid="status-rsvp"><p className="text-sm font-semibold text-primary">Your attendance has been acknowledged.</p><p className="mt-2 text-xs leading-5 text-muted-foreground">Your response has been recorded and cannot be changed.</p><p className="mt-3 text-xs text-muted-foreground">Your response: <strong className="text-foreground">{statusLabel(invite.rsvpStatus)}</strong></p></div>}
           </div>
           <div className="border-l border-accent pl-6">
             <p className="mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">Gathering details</p>
              <div className="mt-5 space-y-6">
               <div><p className="text-xs uppercase tracking-[.1em] text-muted-foreground">{event.wakeKeep.label}</p><p className="serif mt-1 text-2xl text-primary">{event.wakeKeep.date}</p><p className="text-sm">{event.wakeKeep.time}</p></div>
               <div><p className="text-xs uppercase tracking-[.1em] text-muted-foreground">{event.burial.label}</p><p className="serif mt-1 text-2xl text-primary">{event.burial.date}</p><p className="text-sm">{event.burial.time}</p></div>
-               <div><p className="text-xs uppercase tracking-[.1em] text-muted-foreground">Wake keep venue</p><p className="mt-1 text-sm leading-6">{event.wakeKeep.venue}</p><p className="mt-4 text-xs uppercase tracking-[.1em] text-muted-foreground">Burial venue</p><p className="mt-1 text-sm leading-6">{event.burial.venue}</p></div>
+                <div><p className="text-xs uppercase tracking-[.1em] text-muted-foreground">Wake keep venue</p><p className="mt-1 text-sm leading-6">{event.wakeKeep.venue}</p><p className="mt-2 text-xs text-muted-foreground">{event.wakeKeep.dressCode}</p><p className="mt-4 text-xs uppercase tracking-[.1em] text-muted-foreground">Burial venue</p><p className="mt-1 text-sm leading-6">{event.burial.venue}</p><p className="mt-2 text-xs text-muted-foreground">{event.burial.dressCode}</p></div>
             </div>
              <div className="mt-7 flex flex-wrap gap-2">
                <button type="button" onClick={() => downloadCalendar(event, 'wakeKeep')} data-testid="button-calendar-wake-keep" className="border border-border px-3 py-2 text-[10px] font-semibold uppercase tracking-[.11em] transition-colors hover:border-primary">Add wake keep</button>
@@ -320,7 +389,8 @@ function InvitePage() {
              </div>
           </div>
         </section>
-         <div className="flex flex-col gap-4 border-b border-border px-7 py-6 sm:px-12"><p className="text-sm text-muted-foreground">Keep this invitation close for arrival.</p><div className="flex flex-wrap gap-4"><a href={event.wakeKeep.directionsUrl} target="_blank" rel="noreferrer" data-testid="link-invite-wake-directions" className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-primary"><MapPin className="size-4 text-accent" /> Wake directions</a><a href={event.burial.directionsUrl} target="_blank" rel="noreferrer" data-testid="link-invite-burial-directions" className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-primary"><MapPin className="size-4 text-accent" /> Burial directions</a><button type="button" data-testid="button-copy-invitation" onClick={() => navigator.clipboard?.writeText(invite.invitationUrl)} className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-primary"><Copy className="size-4 text-accent" /> Copy invitation link</button></div></div>
+          {invite.rsvpStatus === 'attending' && <section className="border-b border-border bg-secondary/35 px-7 py-8 sm:px-12" data-testid="section-digital-invitation"><div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between"><div><p className="mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">Your digital invitation</p><h2 className="serif mt-2 text-3xl text-primary">{invite.name}</h2><p className="mt-3 text-sm text-muted-foreground">Invitation code</p><p className="mt-1 font-mono text-lg font-semibold tracking-[.12em] text-primary" data-testid="text-invitation-code">{invite.invitationCode}</p><p className="mt-4 text-xs leading-5 text-muted-foreground">Please present your invitation at the entrance.</p></div>{qrDataUrl ? <img src={qrDataUrl} alt={`Matching QR code for ${invite.name}`} className="w-44 border border-border bg-background p-3" data-testid="img-invitation-qr" /> : <div className="grid size-44 place-items-center border border-border bg-background"><LoaderCircle className="size-5 animate-spin text-accent" /></div>}</div></section>}
+          <div className="flex flex-col gap-4 border-b border-border px-7 py-6 sm:px-12"><p className="text-sm text-muted-foreground">Keep this invitation close for arrival.</p><div className="flex flex-wrap gap-4"><a href={event.wakeKeep.directionsUrl} target="_blank" rel="noreferrer" data-testid="link-invite-wake-directions" className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-primary"><MapPin className="size-4 text-accent" /> Wake directions</a><a href={event.burial.directionsUrl} target="_blank" rel="noreferrer" data-testid="link-invite-burial-directions" className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-primary"><MapPin className="size-4 text-accent" /> Burial directions</a><button type="button" data-testid="button-copy-invitation" onClick={() => void copyText(invitationLink)} className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-primary"><Copy className="size-4 text-accent" /> Copy invitation link</button><button type="button" data-testid="button-share-whatsapp-invitation" onClick={() => shareOnWhatsApp(invite.name, invitationLink)} className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-primary"><Share2 className="size-4 text-accent" /> Share on WhatsApp</button></div></div>
       </main>
     </div>
   );
@@ -450,27 +520,52 @@ function GuestForm({ guest, onDone }: { guest?: Guest; onDone: () => void }) {
 }
 
 function GuestModal({ guest, onClose }: { guest?: Guest; onClose: () => void }) {
-  return <div className="fixed inset-0 z-30 grid place-items-center bg-primary/60 p-4" role="dialog" aria-modal="true" data-testid="dialog-guest"><div className="w-full max-w-md border border-border bg-background p-6 shadow-xl sm:p-8"><div className="flex items-start justify-between"><div><p className="mono text-[10px] uppercase tracking-[.18em] text-muted-foreground">{guest ? 'Edit record' : 'New invitation'}</p><h2 className="serif mt-2 text-3xl text-primary">{guest ? 'Update guest' : 'Add a guest'}</h2></div><button type="button" onClick={onClose} data-testid="button-close-guest-modal" className="text-muted-foreground hover:text-foreground"><X className="size-5" /></button></div><div className="mt-7"><GuestForm guest={guest} onDone={onClose} /></div></div></div>;
+  return <div className="fixed inset-0 z-30 grid place-items-center bg-primary/60 p-4" role="dialog" aria-modal="true" data-testid="dialog-guest"><div className="w-full max-w-md border border-border bg-background p-6 shadow-xl sm:p-8"><div className="flex items-start justify-between"><div><p className="mono text-[10px] uppercase tracking-[.18em] text-muted-foreground">{guest ? 'Edit record' : 'New invitation'}</p><h2 className="serif mt-2 text-3xl text-primary">{guest ? 'Update guest' : 'Add a guest'}</h2></div><button type="button" onClick={onClose} data-testid="button-close-guest-modal" className="text-muted-foreground hover:text-foreground"><X className="size-5" /></button></div>{guest && <div className="mt-6 border-b border-border pb-6"><GuestAdminActions guest={guest} /></div>}<div className="mt-7"><GuestForm guest={guest} onDone={onClose} /></div></div></div>;
 }
 
 function GuestQrDialog({ guest, onClose }: { guest: Guest; onClose: () => void }) {
   const [qrDataUrl, setQrDataUrl] = useState('');
   useEffect(() => {
-    void QRCode.toDataURL(guest.invitationUrl, {
+    void QRCode.toDataURL(guest.invitationCode, {
       width: 560,
       margin: 2,
       errorCorrectionLevel: 'M',
       color: { dark: '#172b25', light: '#f7f3eb' },
     }).then(setQrDataUrl);
-  }, [guest.invitationUrl]);
+  }, [guest.invitationCode]);
   const print = () => {
     if (!qrDataUrl) return;
     const printWindow = window.open('', '_blank', 'width=640,height=760');
     if (!printWindow) return;
-    printWindow.document.write(`<html><head><title>Invitation QR — ${guest.name}</title></head><body style="font-family:Arial,sans-serif;text-align:center;padding:32px"><h1>${guest.name}</h1><img src="${qrDataUrl}" alt="Invitation QR code" style="width:420px;max-width:100%"/><p>${guest.token}</p><script>window.onload=function(){window.print();}</script></body></html>`);
+    printWindow.document.write(`<html><head><title>Invitation QR — ${guest.name}</title></head><body style="font-family:Arial,sans-serif;text-align:center;padding:32px"><h1>${guest.name}</h1><img src="${qrDataUrl}" alt="Invitation QR code" style="width:420px;max-width:100%"/><p>${guest.invitationCode}</p><script>window.onload=function(){window.print();}</script></body></html>`);
     printWindow.document.close();
   };
-  return <div className="fixed inset-0 z-40 grid place-items-center bg-primary/70 p-4" role="dialog" aria-modal="true" data-testid="dialog-guest-qr"><div className="w-full max-w-md border border-border bg-background p-6 text-center shadow-xl sm:p-8"><div className="flex items-start justify-between text-left"><div><p className="mono text-[10px] uppercase tracking-[.18em] text-muted-foreground">Private invitation code</p><h2 className="serif mt-2 text-3xl text-primary">{guest.name}</h2></div><button type="button" onClick={onClose} data-testid="button-close-qr-dialog"><X className="size-5 text-muted-foreground" /></button></div>{qrDataUrl ? <img src={qrDataUrl} alt={`QR code for ${guest.name}`} className="mx-auto mt-7 w-full max-w-[280px] border border-border p-3" data-testid="img-guest-qr" /> : <div className="mx-auto mt-7 grid aspect-square max-w-[280px] place-items-center border border-border"><LoaderCircle className="size-6 animate-spin text-accent" /></div>}<p className="mt-5 font-mono text-sm font-semibold text-primary" data-testid="text-guest-invitation-code">{guest.invitationCode}</p><p className="mt-2 break-all font-mono text-xs text-muted-foreground" data-testid="text-guest-token">{guest.token}</p><p className="mt-2 break-all text-xs text-muted-foreground" data-testid="text-guest-invitation-url">{guest.invitationUrl}</p><div className="mt-6 grid grid-cols-2 gap-2"><a href={qrDataUrl || undefined} download={`invitation-${guest.name.replace(/\s+/g, '-').toLowerCase()}.png`} onClick={(event) => { if (!qrDataUrl) event.preventDefault(); }} data-testid="button-download-qr" className="border border-primary px-3 py-3 text-xs font-semibold uppercase tracking-[.11em]">Download QR</a><button type="button" onClick={print} disabled={!qrDataUrl} data-testid="button-print-qr" className="bg-primary px-3 py-3 text-xs font-semibold uppercase tracking-[.11em] text-primary-foreground disabled:opacity-50">Print QR</button></div></div></div>;
+  return <div className="fixed inset-0 z-40 grid place-items-center bg-primary/70 p-4" role="dialog" aria-modal="true" data-testid="dialog-guest-qr"><div className="w-full max-w-md border border-border bg-background p-6 text-center shadow-xl sm:p-8"><div className="flex items-start justify-between text-left"><div><p className="mono text-[10px] uppercase tracking-[.18em] text-muted-foreground">Private invitation code</p><h2 className="serif mt-2 text-3xl text-primary">{guest.name}</h2></div><button type="button" onClick={onClose} data-testid="button-close-qr-dialog"><X className="size-5 text-muted-foreground" /></button></div>{qrDataUrl ? <img src={qrDataUrl} alt={`QR code for ${guest.name}`} className="mx-auto mt-7 w-full max-w-[280px] border border-border p-3" data-testid="img-guest-qr" /> : <div className="mx-auto mt-7 grid aspect-square max-w-[280px] place-items-center border border-border"><LoaderCircle className="size-6 animate-spin text-accent" /></div>}<p className="mt-5 font-mono text-sm font-semibold text-primary" data-testid="text-guest-invitation-code">{guest.invitationCode}</p><p className="mt-2 break-all text-xs text-muted-foreground" data-testid="text-guest-invitation-url">{guest.invitationUrl}</p><div className="mt-6 grid grid-cols-2 gap-2"><a href={qrDataUrl || undefined} download={`invitation-${guest.name.replace(/\s+/g, '-').toLowerCase()}.png`} onClick={(event) => { if (!qrDataUrl) event.preventDefault(); }} data-testid="button-download-qr" className="border border-primary px-3 py-3 text-xs font-semibold uppercase tracking-[.11em]">Download QR</a><button type="button" onClick={print} disabled={!qrDataUrl} data-testid="button-print-qr" className="bg-primary px-3 py-3 text-xs font-semibold uppercase tracking-[.11em] text-primary-foreground disabled:opacity-50">Print QR</button></div><div className="mt-2 grid grid-cols-2 gap-2"><button type="button" onClick={() => shareOnWhatsApp(guest.name, guest.invitationUrl)} data-testid="button-whatsapp-guest" className="border border-border px-3 py-3 text-[10px] font-semibold uppercase tracking-[.1em]">WhatsApp</button><button type="button" onClick={() => void shareInvitation(guest.name, guest.invitationUrl)} data-testid="button-share-guest" className="border border-border px-3 py-3 text-[10px] font-semibold uppercase tracking-[.1em]"><Share2 className="mr-1 inline size-3" /> Share</button></div></div></div>;
+}
+
+function GuestAdminActions({ guest }: { guest: Guest }) {
+  const queryClient = useQueryClient();
+  const updateRsvp = useUpdateGuestRsvp();
+  const checkIn = useAdminCheckInGuest();
+  const undoCheckIn = useAdminUndoCheckIn();
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: getListGuestsQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetAdminDashboardQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetGuestQueryKey(guest.id) });
+  };
+  const setRsvp = (status: 'attending' | 'not_attending') => updateRsvp.mutate({ id: guest.id, data: { status } }, { onSuccess: refresh });
+  const toggleCheckIn = () => {
+    if (guest.checkedIn) undoCheckIn.mutate({ id: guest.id }, { onSuccess: refresh });
+    else checkIn.mutate({ id: guest.id }, { onSuccess: refresh });
+  };
+  const pending = updateRsvp.isPending || checkIn.isPending || undoCheckIn.isPending;
+  return <div className="flex flex-wrap items-center gap-2" data-testid={`actions-guest-${guest.id}`}>
+    <select value={guest.rsvpStatus === 'pending' ? '' : guest.rsvpStatus} onChange={(event) => { if (event.target.value) setRsvp(event.target.value as 'attending' | 'not_attending'); }} disabled={pending} aria-label={`RSVP for ${guest.name}`} data-testid={`select-rsvp-${guest.id}`} className="h-8 border border-input bg-background px-2 text-[10px] font-semibold uppercase tracking-[.08em]">
+      <option value="">Awaiting reply</option><option value="attending">Attending</option><option value="not_attending">Unable to attend</option>
+    </select>
+    <button type="button" onClick={toggleCheckIn} disabled={pending} data-testid={`button-${guest.checkedIn ? 'undo' : 'manual'}-checkin-${guest.id}`} className="h-8 border border-border px-2 text-[10px] font-semibold uppercase tracking-[.08em] disabled:opacity-50">{guest.checkedIn ? 'Undo check-in' : 'Manual check-in'}</button>
+    {guest.checkedInAt && <span className="w-full text-[10px] text-muted-foreground">Arrived {new Date(guest.checkedInAt).toLocaleString('en-GB')}</span>}
+  </div>;
 }
 
 function ImportModal({ onClose }: { onClose: () => void }) {
@@ -478,9 +573,15 @@ function ImportModal({ onClose }: { onClose: () => void }) {
   const importer = useImportGuests();
   const queryClient = useQueryClient();
   const [csv, setCsv] = useState('name,phone,email\n');
+  const loadFile = (file?: File) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCsv(String(reader.result ?? ''));
+    reader.readAsText(file);
+  };
   const doPreview = () => preview.mutate({ data: { csvText: csv } });
   const doImport = () => importer.mutate({ data: { csvText: csv } }, { onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListGuestsQueryKey() }); queryClient.invalidateQueries({ queryKey: getGetAdminDashboardQueryKey() }); onClose(); } });
-  return <div className="fixed inset-0 z-30 grid place-items-center bg-primary/60 p-4" role="dialog" aria-modal="true" data-testid="dialog-import"><div className="max-h-[90dvh] w-full max-w-2xl overflow-y-auto border border-border bg-background p-6 shadow-xl sm:p-8"><div className="flex items-start justify-between"><div><p className="mono text-[10px] uppercase tracking-[.18em] text-muted-foreground">Guest list</p><h2 className="serif mt-2 text-3xl text-primary">Import guests</h2></div><button type="button" onClick={onClose} data-testid="button-close-import-modal"><X className="size-5 text-muted-foreground" /></button></div><p className="mt-3 text-sm text-muted-foreground">Paste CSV or spreadsheet data below. Tabs, commas, and headers for name, phone, and email are supported.</p><textarea value={csv} onChange={(event) => setCsv(event.target.value)} rows={7} data-testid="textarea-guest-csv" className="mt-6 w-full border border-input bg-card p-3 font-mono text-xs outline-none focus:border-primary" />{preview.data && <div className="mt-4 border border-border p-4" data-testid="section-import-preview"><div className="flex flex-wrap gap-5 text-xs"><span><strong className="text-primary">{preview.data.validCount}</strong> valid</span><span><strong className="text-destructive">{preview.data.invalidCount}</strong> invalid</span><span><strong>{preview.data.duplicateCount}</strong> duplicates</span></div><div className="mt-4 max-h-40 overflow-auto text-xs">{preview.data.rows.map((row) => <div key={row.rowNumber} className="flex justify-between border-t border-border py-2"><span>{row.rowNumber}. {row.name || 'Unnamed'}</span><span className={row.valid && !row.duplicate ? 'text-primary' : 'text-destructive'}>{row.error || (row.duplicate ? 'Duplicate' : 'Ready')}</span></div>)}</div></div>}{(preview.isError || importer.isError) && <p className="mt-4 text-xs text-destructive" data-testid="status-import-error">{errorMessage(preview.error || importer.error)}</p>}<div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><button type="button" onClick={onClose} data-testid="button-cancel-import" className="h-11 border border-border px-5 text-xs font-semibold uppercase tracking-[.12em]">Cancel</button><button type="button" onClick={doPreview} disabled={preview.isPending || !csv.trim()} data-testid="button-preview-import" className="h-11 border border-primary px-5 text-xs font-semibold uppercase tracking-[.12em]">{preview.isPending ? 'Checking…' : 'Preview rows'}</button>{preview.data && <button type="button" onClick={doImport} disabled={importer.isPending || preview.data.validCount === 0} data-testid="button-confirm-import" className="h-11 bg-primary px-5 text-xs font-semibold uppercase tracking-[.12em] text-primary-foreground">{importer.isPending ? 'Importing…' : 'Import guests'}</button>}</div></div></div>;
+  return <div className="fixed inset-0 z-30 grid place-items-center bg-primary/60 p-4" role="dialog" aria-modal="true" data-testid="dialog-import"><div className="max-h-[90dvh] w-full max-w-2xl overflow-y-auto border border-border bg-background p-6 shadow-xl sm:p-8"><div className="flex items-start justify-between"><div><p className="mono text-[10px] uppercase tracking-[.18em] text-muted-foreground">Guest list</p><h2 className="serif mt-2 text-3xl text-primary">Import guests</h2></div><button type="button" onClick={onClose} data-testid="button-close-import-modal"><X className="size-5 text-muted-foreground" /></button></div><p className="mt-3 text-sm text-muted-foreground">Upload a CSV or paste spreadsheet data below. Tabs, commas, and headers for name, phone, and email are supported.</p><label className="mt-6 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-primary/40 bg-secondary/30 px-4 py-5 text-xs font-semibold uppercase tracking-[.12em] text-primary"><FileUp className="size-4 text-accent" /> Choose CSV file<input type="file" accept=".csv,text/csv" onChange={(event) => loadFile(event.target.files?.[0])} data-testid="input-guest-csv-file" className="sr-only" /></label><textarea value={csv} onChange={(event) => setCsv(event.target.value)} rows={7} data-testid="textarea-guest-csv" className="mt-4 w-full border border-input bg-card p-3 font-mono text-xs outline-none focus:border-primary" />{preview.data && <div className="mt-4 border border-border p-4" data-testid="section-import-preview"><div className="flex flex-wrap gap-5 text-xs"><span><strong className="text-primary">{preview.data.validCount}</strong> valid</span><span><strong className="text-destructive">{preview.data.invalidCount}</strong> invalid</span><span><strong>{preview.data.duplicateCount}</strong> duplicates</span></div><div className="mt-4 max-h-40 overflow-auto text-xs">{preview.data.rows.map((row) => <div key={row.rowNumber} className="flex justify-between border-t border-border py-2"><span>{row.rowNumber}. {row.name || 'Unnamed'}</span><span className={row.valid && !row.duplicate ? 'text-primary' : 'text-destructive'}>{row.error || (row.duplicate ? 'Duplicate' : 'Ready')}</span></div>)}</div></div>}{(preview.isError || importer.isError) && <p className="mt-4 text-xs text-destructive" data-testid="status-import-error">{errorMessage(preview.error || importer.error)}</p>}<div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><button type="button" onClick={onClose} data-testid="button-cancel-import" className="h-11 border border-border px-5 text-xs font-semibold uppercase tracking-[.12em]">Cancel</button><button type="button" onClick={doPreview} disabled={preview.isPending || !csv.trim()} data-testid="button-preview-import" className="h-11 border border-primary px-5 text-xs font-semibold uppercase tracking-[.12em]">{preview.isPending ? 'Checking…' : 'Preview rows'}</button>{preview.data && <button type="button" onClick={doImport} disabled={importer.isPending || preview.data.validCount === 0} data-testid="button-confirm-import" className="h-11 bg-primary px-5 text-xs font-semibold uppercase tracking-[.12em] text-primary-foreground">{importer.isPending ? 'Importing…' : 'Import guests'}</button>}</div></div></div>;
 }
 
 function AdminWorkspace({ onLogout }: { onLogout: () => void }) {
@@ -488,7 +589,8 @@ function AdminWorkspace({ onLogout }: { onLogout: () => void }) {
   const dashboard = useGetAdminDashboard({ query: { queryKey: getGetAdminDashboardQueryKey() } });
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'checked_in' | 'not_checked_in'>('all');
-  const guestsQuery = useListGuests({ search: search || undefined, checkInStatus: filter }, { query: { queryKey: getListGuestsQueryKey({ search: search || undefined, checkInStatus: filter }) } });
+  const [rsvpFilter, setRsvpFilter] = useState<'all' | 'attending' | 'not_attending' | 'pending'>('all');
+  const guestsQuery = useListGuests({ search: search || undefined, checkInStatus: filter, rsvpStatus: rsvpFilter === 'all' ? undefined : rsvpFilter }, { query: { queryKey: getListGuestsQueryKey({ search: search || undefined, checkInStatus: filter, rsvpStatus: rsvpFilter === 'all' ? undefined : rsvpFilter }) } });
   const selectedIdState = useState<number | null>(null);
   const [selectedId, setSelectedId] = selectedIdState;
   const [modal, setModal] = useState<'create' | 'import' | null>(null);

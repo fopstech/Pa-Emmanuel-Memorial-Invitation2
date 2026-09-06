@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import {
   GetInvitationParams,
   UpdateRsvpBody,
@@ -7,7 +7,7 @@ import {
 } from "@workspace/api-zod";
 import { db, guestsTable } from "@workspace/db";
 import { memorialEvent } from "../lib/event";
-import { checkInGuest, findGuestByToken, serializeInvitation } from "../lib/guest-utils";
+import { findGuestByToken, serializeInvitation } from "../lib/guest-utils";
 
 const router: IRouter = Router();
 
@@ -28,10 +28,23 @@ router.get("/invitations/:token", async (req, res) => {
 router.patch("/invitations/:token/rsvp", async (req, res) => {
   const { token } = UpdateRsvpParams.parse(req.params);
   const { status } = UpdateRsvpBody.parse(req.body);
+  const [existing] = await db
+    .select({ rsvpStatus: guestsTable.rsvpStatus })
+    .from(guestsTable)
+    .where(eq(guestsTable.token, token))
+    .limit(1);
+  if (!existing) {
+    res.status(404).json({ error: "Invitation not found." });
+    return;
+  }
+  if (existing.rsvpStatus !== "pending") {
+    res.status(409).json({ error: "Your response has already been recorded and cannot be changed." });
+    return;
+  }
   const [guest] = await db
     .update(guestsTable)
     .set({ rsvpStatus: status, updatedAt: new Date() })
-    .where(eq(guestsTable.token, token))
+    .where(and(eq(guestsTable.token, token), eq(guestsTable.rsvpStatus, "pending")))
     .returning();
 
   if (!guest) {
@@ -39,11 +52,6 @@ router.patch("/invitations/:token/rsvp", async (req, res) => {
     return;
   }
   res.json(serializeInvitation(guest, req));
-});
-
-router.post("/invitations/:token/check-in", async (req, res) => {
-  const { token } = GetInvitationParams.parse(req.params);
-  res.json(await checkInGuest(token));
 });
 
 export default router;

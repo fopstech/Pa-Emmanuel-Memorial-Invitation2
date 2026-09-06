@@ -13,5 +13,6 @@ export interface EventOccurrence {
   isoStart?: string;
   isoEnd?: string;
   venue: string;
+  dressCode: string;
   directionsUrl?: string;
 }

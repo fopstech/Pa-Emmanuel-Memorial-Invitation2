@@ -16,6 +16,7 @@ export interface EventOccurrence {
   isoStart?: string;
   isoEnd?: string;
   venue: string;
+  dressCode: string;
   directionsUrl?: string;
 }
 
@@ -24,7 +25,8 @@ export interface Event {
   title: string;
   wakeKeep: EventOccurrence;
   burial: EventOccurrence;
-  dressCode: string;
+  clothingDeadline: string;
+  clothingImage: string;
   photos: string[];
 }
 
@@ -66,8 +68,7 @@ export interface Guest {
 
 export interface Invitation {
   name: string;
-  token: string;
-  invitationUrl: string;
+  invitationCode: string;
   event: Event;
   rsvpStatus: RsvpStatus;
   checkedIn: boolean;

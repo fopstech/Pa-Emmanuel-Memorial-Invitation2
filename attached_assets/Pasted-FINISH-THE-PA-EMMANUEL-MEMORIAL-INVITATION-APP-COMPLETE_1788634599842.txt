@@ -1,0 +1,813 @@
+FINISH THE PA EMMANUEL MEMORIAL INVITATION APP COMPLETELY.
+
+Inspect the current project first. Preserve anything that already works, but fix incomplete, broken, ugly, or missing functionality. Do not create a separate project.
+
+The final result must be a complete, polished, working memorial invitation website — not a UI mockup.
+
+==================================================
+EVENT INFORMATION
+==================================================
+
+Memorial:
+Pa Emmanuel Ayodele Abatan
+
+WAKE KEEP
+Date: October 15, 2026
+Time: 4:00 PM
+Venue: CGCC Citadel Global Community Church
+
+BURIAL
+Date: October 16, 2026
+Time: 2:00 PM
+Venue: Ronnie D'Events
+
+DRESS CODE:
+Purple
+
+CLOTHING ORDER DEADLINE:
+September 30, 2026
+
+==================================================
+1. PUBLIC MEMORIAL INVITATION
+==================================================
+
+The public website must look like a PREMIUM DIGITAL MEMORIAL INVITATION.
+
+Do NOT make it look like:
+- a SaaS dashboard
+- a generic AI website
+- a boring form
+- an admin panel
+
+Design direction:
+
+Primary colour:
+Elegant purple
+
+Accent:
+Subtle gold
+
+Use gold sparingly for:
+- borders
+- headings
+- dividers
+- buttons
+- small decorative elements
+
+The overall appearance should be:
+- elegant
+- respectful
+- warm
+- premium
+- modern
+- mobile-first
+
+Use Pa Emmanuel's uploaded photograph as the major visual centerpiece.
+
+The photograph should be:
+- beautifully framed
+- prominent in the hero section
+- integrated into the invitation design
+- used with tasteful overlays where necessary
+- responsive
+- not distorted
+- not replaced with random stock photos
+
+Do not invent biographical facts.
+
+Include tasteful memorial sections such as:
+- Invitation
+- About / Memorial message
+- Event details
+- Dress code
+- RSVP
+- Guest invitation information
+- Memorial gallery
+
+Keep text concise and meaningful.
+
+==================================================
+2. SHARED LINK PREVIEW
+==================================================
+
+When a personalized invitation link is shared on WhatsApp or another social platform, the preview must use Pa Emmanuel's photograph.
+
+Set appropriate:
+
+og:title
+og:description
+og:image
+twitter/card metadata
+page title
+
+Title:
+
+"You Are Invited to the Burial of Pa Emmanuel"
+
+Description:
+
+"Join us as we honour and celebrate the life of Pa Emmanuel Ayodele Abatan."
+
+Use Pa Emmanuel's uploaded photograph as the preview image.
+
+Do NOT show a generic Replit image.
+
+Browser title:
+
+"Pa Emmanuel Memorial Invitation"
+
+==================================================
+3. FAVICON
+==================================================
+
+Use Pa Emmanuel's photograph as the website favicon.
+
+Make it square/cropped appropriately so it works well as a browser icon.
+
+==================================================
+4. PERSONALIZED GUEST INVITATION
+==================================================
+
+Each guest gets a unique invitation.
+
+Route:
+
+/invite/:token
+
+When opened, display:
+
+"YOU ARE INVITED"
+
+"Welcome, [Guest Name]"
+
+Then show the beautiful memorial invitation.
+
+Guests must NOT see:
+- database ID
+- internal token
+- API information
+- admin information
+- technical information
+
+Guests do NOT need:
+- account
+- login
+- password
+- email authentication
+- OTP
+- Google login
+
+==================================================
+5. GUEST CREATION
+==================================================
+
+Admin must be able to manually add a guest.
+
+Fields:
+
+Name — required
+Phone — optional
+Email — optional
+
+When a guest is created, automatically generate:
+
+1. Unique guest invitation identity
+2. Unique human-friendly invitation code
+3. Unique invitation link
+4. Matching QR code
+
+Example:
+
+Invitation Code:
+PMA-7K4X92
+
+The admin should never have to manually generate these.
+
+==================================================
+6. CODE + QR MUST REPRESENT THE SAME INVITATION
+==================================================
+
+CRITICAL:
+
+Every guest has:
+
+ONE invitation identity
+↓
+ONE invitation code
++
+ONE QR code
+
+The QR and invitation code MUST identify the exact same guest.
+
+Example:
+
+Guest:
+John Doe
+
+Code:
+PMA-7K4X92
+
+QR:
+Generated from John Doe's same invitation identity.
+
+Do NOT create a different identity for the QR.
+
+Do NOT create a different code for the QR.
+
+Both are simply two methods of identifying the SAME invitation.
+
+==================================================
+7. RSVP
+==================================================
+
+The RSVP section must be beautiful.
+
+Do NOT use an ugly generic form.
+
+Make Pa Emmanuel's photograph part of the RSVP design.
+
+Show:
+
+"Will you be joining us?"
+
+Buttons:
+
+"YES, I'LL BE ATTENDING"
+
+"NO, I WON'T BE ABLE TO ATTEND"
+
+Once the guest chooses a response:
+
+Show:
+
+"Your attendance has been acknowledged."
+
+"Your response has been recorded and cannot be changed."
+
+Guests cannot change their RSVP afterward.
+
+Only the authorized admin can change an RSVP.
+
+Store RSVP persistently in the database.
+
+Refreshing the page must NOT erase the RSVP.
+
+==================================================
+8. ATTENDING GUEST QR + CODE
+==================================================
+
+If the guest selects:
+
+"YES, I'LL BE ATTENDING"
+
+show a beautiful section:
+
+"YOUR INVITATION"
+
+"Please present your invitation at the entrance."
+
+Show both:
+
+Invitation Code:
+[PMA-XXXXXX]
+
+QR Code:
+[matching QR]
+
+The guest may use EITHER:
+
+- their QR code
+OR
+- their invitation code
+
+at the entrance.
+
+The QR and code must always refer to the same guest.
+
+==================================================
+9. GUEST SELF CHECK-IN
+==================================================
+
+REMOVE guest self-check-in.
+
+Guests may RSVP themselves.
+
+Guests may view their invitation code and QR.
+
+Guests may NOT mark themselves as checked in.
+
+Only authorized:
+- Ushers
+- Admin
+
+can perform check-in.
+
+==================================================
+10. USHER CHECK-IN
+==================================================
+
+Route:
+
+/check-in
+
+Usher access code:
+
+30
+
+Create a simple usher access screen.
+
+Entering 30 opens the usher check-in system.
+
+Use secure server-side session authentication.
+
+Do NOT expose the code in frontend JavaScript.
+
+After access, usher gets two options:
+
+OPTION A:
+SCAN QR CODE
+
+Use the phone's camera directly through the website.
+
+Do NOT require another QR scanner application.
+
+OPTION B:
+ENTER INVITATION CODE
+
+Example:
+
+PMA-7K4X92
+
+Both methods MUST use the exact same backend check-in logic.
+
+QR Guest A = Guest A
+
+Code for Guest A = Guest A
+
+They must never create different guest records.
+
+==================================================
+11. USHER CHECK-IN RESULTS
+==================================================
+
+If guest has not checked in:
+
+Show:
+
+CHECK-IN SUCCESSFUL
+
+Guest:
+[Guest Name]
+
+Invitation:
+[Code]
+
+Time:
+[Current time]
+
+Then save:
+
+checkedIn = true
+checkedInAt = timestamp
+
+If the same guest is scanned/entered again:
+
+Show:
+
+ALREADY CHECKED IN
+
+Guest:
+[Guest Name]
+
+Checked in:
+[Original timestamp]
+
+Do not allow duplicate check-in.
+
+==================================================
+12. ADMIN ACCESS
+==================================================
+
+Route:
+
+/admin
+
+Admin access code:
+
+2011
+
+Show an admin access screen.
+
+Entering 2011 opens the admin dashboard.
+
+Use secure server-side session authentication.
+
+Do NOT expose 2011 in client-side source.
+
+Guests must not be able to access the admin dashboard simply by knowing the URL.
+
+==================================================
+13. ADMIN DASHBOARD
+==================================================
+
+Keep the admin dashboard SIMPLE and useful.
+
+Do not make it a giant generic SaaS dashboard.
+
+Title:
+
+MEMORIAL ADMIN
+
+Dashboard statistics:
+
+Total Guests
+Attending
+Not Attending
+Pending
+Checked In
+Not Checked In
+
+Admin functions:
+
+- Add guest
+- Edit guest
+- Delete guest
+- Search guests
+- Filter guests
+- View guest
+- Copy invitation link
+- Copy invitation code
+- View QR
+- Download QR
+- Print QR
+- Change RSVP if necessary
+- Manually check guest in
+- Undo check-in if necessary
+- View check-in time
+
+==================================================
+14. ADMIN CHECK-IN
+==================================================
+
+Admin must be able to check in guests from the admin dashboard.
+
+Admin can:
+
+Search guest
+↓
+Open guest
+↓
+Check In
+
+This must use the same check-in backend logic as the usher scanner.
+
+==================================================
+15. SPREADSHEET / CSV IMPORT
+==================================================
+
+Admin must have TWO import options.
+
+OPTION A:
+Upload CSV
+
+OPTION B:
+Paste spreadsheet data directly.
+
+Example pasted data:
+
+Name    Phone    Email
+John Doe    08012345678    john@email.com
+Mary Doe    08098765432    mary@email.com
+Peter Doe    08011112222    peter@email.com
+
+Automatically:
+- detect columns
+- separate rows
+- show preview
+- identify invalid rows
+- allow admin to confirm import
+
+When confirmed:
+
+Create each guest separately.
+
+Automatically generate for EACH guest:
+
+Unique invitation identity
+Unique invitation code
+Unique invitation URL
+Unique matching QR
+
+Prevent accidental duplicate guest imports.
+
+Phone and Email are optional.
+
+Email must NEVER be required for guests.
+
+==================================================
+16. CLOTHING / DRESS CODE
+==================================================
+
+Display:
+
+DRESS CODE
+
+PURPLE
+
+Include the uploaded clothing image beautifully.
+
+If guests are selecting/requesting clothing:
+
+The clothing order/purchase selection must close after:
+
+September 30, 2026
+
+After the deadline, display:
+
+"CLOTHING ORDERS ARE NOW CLOSED"
+
+Do not allow new clothing orders/selections after the deadline.
+
+If a guest has already selected clothing before the deadline, preserve their existing selection.
+
+==================================================
+17. EVENT DETAILS DESIGN
+==================================================
+
+Clearly separate the two events.
+
+WAKE KEEP
+
+October 15, 2026
+4:00 PM
+
+CGCC Citadel Global Community Church
+
+
+BURIAL
+
+October 16, 2026
+2:00 PM
+
+Ronnie D'Events
+
+DO NOT accidentally show CGCC as the burial venue.
+
+DO NOT show Ronnie D'Events as the wake-keep venue.
+
+==================================================
+18. MEMORIAL PHOTOS
+==================================================
+
+Use the photographs I upload.
+
+Main Pa Emmanuel photograph:
+- hero
+- invitation centerpiece
+- social preview image
+- favicon where appropriate
+
+Additional photos:
+- beautiful memorial gallery
+
+Do NOT use random stock people.
+
+Do NOT invent people.
+
+Do NOT distort faces.
+
+==================================================
+19. DATABASE
+==================================================
+
+Use the existing persistent database.
+
+Do NOT use localStorage as the primary database.
+
+Do NOT hard-code guest records.
+
+Guest should have fields similar to:
+
+id
+name
+phone
+email
+invitationCode
+token
+rsvpStatus
+checkedIn
+checkedInAt
+createdAt
+updatedAt
+
+Ensure:
+
+invitationCode is unique
+token is unique
+
+Database must survive:
+- refresh
+- browser restart
+- server restart
+- deployment
+
+==================================================
+20. SECURITY
+==================================================
+
+Admin code:
+2011
+
+Usher code:
+30
+
+Keep both server-side.
+
+Do not put them in:
+- React source
+- HTML
+- public JavaScript
+- client configuration
+
+Do not expose:
+- database credentials
+- API keys
+- environment secrets
+
+Do not commit real secrets to GitHub.
+
+Use secure sessions for admin and usher access.
+
+==================================================
+21. ROUTES
+==================================================
+
+Required routes:
+
+/
+Public memorial invitation
+
+/invite/:token
+Personalized guest invitation
+
+/admin
+Protected admin area
+
+/check-in
+Protected usher check-in
+
+All routes must work when directly opened in the browser.
+
+Do not create conflicting routes.
+
+==================================================
+22. MOBILE-FIRST
+==================================================
+
+Most guests and ushers will use phones.
+
+Test and optimize for:
+
+Android
+iPhone
+Tablet
+Desktop
+
+The usher check-in page must have large, easy-to-use buttons.
+
+The invitation must look beautiful on a phone.
+
+==================================================
+23. PUBLIC PAGE MUST NOT SHOW ADMIN/USHER LINKS
+==================================================
+
+Do NOT show:
+
+Admin
+Admin Login
+Usher
+Check-in
+Dashboard
+
+on the public invitation.
+
+Those routes should only be accessible by directly entering the protected URL and authenticating.
+
+==================================================
+24. ERROR HANDLING
+==================================================
+
+Handle properly:
+
+Invalid invitation
+Invalid code
+Already checked in
+Invalid QR
+Camera permission denied
+Camera unavailable
+Duplicate guest
+Invalid CSV
+Invalid pasted spreadsheet
+Database error
+Network error
+
+Never leave broken buttons.
+
+==================================================
+25. FINAL TESTING
+==================================================
+
+Before declaring the project finished, actually test this complete flow.
+
+ADMIN:
+
+1. Open /admin
+2. Enter 2011
+3. Dashboard opens
+4. Add guest
+5. Unique code generated
+6. Matching QR generated
+7. Invitation link generated
+8. Copy invitation link
+9. Edit guest
+10. Delete guest
+11. Search guest
+12. Admin can check in guest
+
+SPREADSHEET:
+
+13. Paste spreadsheet
+14. Columns separate correctly
+15. Preview works
+16. Import works
+17. Multiple guests created
+18. Every guest gets a different code
+19. Every guest gets a matching QR
+20. Duplicate import is handled
+
+GUEST:
+
+21. Open personalized invitation
+22. Guest name appears
+23. Pa Emmanuel photo appears beautifully
+24. RSVP works
+25. RSVP persists
+26. RSVP becomes locked
+27. Attending guest sees code
+28. Attending guest sees matching QR
+
+USHER:
+
+29. Open /check-in
+30. Enter 30
+31. Camera opens
+32. Scan QR
+33. Correct guest appears
+34. Guest successfully checked in
+35. Scan same QR again
+36. Already Checked In appears
+37. Enter same guest's invitation code manually
+38. Same guest is found
+39. Already Checked In appears
+
+EVENT:
+
+40. Wake Keep = CGCC Citadel Global Community Church
+41. Burial = Ronnie D'Events
+42. Dates correct
+43. Times correct
+44. Purple dress code displayed
+45. Clothing deadline is September 30, 2026
+
+DESIGN:
+
+46. Purple + subtle gold
+47. Pa Emmanuel photo is the centerpiece
+48. RSVP UI is elegant
+49. Mobile UI looks excellent
+50. Shared link preview uses Pa Emmanuel photo
+51. Favicon uses Pa Emmanuel photo
+52. No generic Replit preview image
+53. No ugly generic dashboard on the public site
+
+BUILD:
+
+54. Run typecheck
+55. Run production build
+56. Fix all errors
+57. Test every route
+58. Confirm database persistence
+59. Confirm no secrets are exposed
+60. Confirm final application is deployable on Replit
+
+IMPORTANT:
+
+Do not stop at a visual mockup.
+
+Do not leave functionality as "can be implemented later."
+
+Finish the actual working application.
+
+Make sensible technical decisions without asking unnecessary questions.
+
+The final public website should feel like a real, elegant memorial invitation — not a software project.
